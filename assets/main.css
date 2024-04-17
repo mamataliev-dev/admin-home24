@@ -1,0 +1,295 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Connect fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+body,
+html {
+  font-size: 14px !important;
+  color: #ffffff !important;
+  font-family: !important;
+  font-family: 'Nunito Sans', sans-serif !important;
+  font-style: normal !important;
+  font-weight: regular !important;
+  background-color: #1b2431 !important;
+}
+
+h1 {
+  color: #ffffff !important;
+}
+
+.table__container {
+  width: 100% !important;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.24);
+  border-radius: 25px;
+}
+
+.table__thead {
+  background-color: #323d4e !important;
+  padding-top: 16px !important;
+  border-radius: 20px;
+}
+
+.table__tr_border-l {
+  border-top-left-radius: 20px;
+  padding-left: 30px !important;
+  color: #b5b5c3 !important;
+  font-size: 13px !important;
+}
+
+.table__tr_border-r {
+  border-top-right-radius: 20px;
+  color: #b5b5c3 !important;
+  font-size: 13px !important;
+}
+
+.table__tr_border-b:last-child {
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.table__tr {
+  padding-top: 16px !important;
+  padding-bottom: 13px !important;
+  color: #b5b5c3 !important;
+  font-size: 13px !important;
+}
+
+.tbody_tr {
+  background-color: #273142;
+}
+
+.tbody_tr:hover {
+  background-color: #495669;
+  transition: all;
+  transition-duration: 0.3s;
+}
+
+.tbody__td {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.tbody__tr:last-child {
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+table tr:last-child td:first-child {
+  border-bottom-left-radius: 20px;
+}
+
+table tr:last-child td:last-child {
+  border-bottom-right-radius: 20px;
+}
+
+.tbody__td_center {
+  text-align: center;
+}
+
+.tbody_tr:not(:last-child) {
+  border-bottom: 0.4px solid #979797;
+}
+
+.tbody_tr_radius-l {
+  border-bottom-left-radius: 20px;
+}
+
+.tbody_tr_radius-r {
+  border-bottom-left-radius: 20px;
+}
+
+.el-input__inner {
+  background-color: #323d4e !important;
+  color: white !important;
+  height: 46px !important;
+  outline: none !important;
+  border: 0.1px solid !important;
+  border-radius: 0.5rem !important;
+}
+
+.el-input__inner:focus {
+  outline: none !important;
+}
+
+.el-select-dropdown__item {
+  background-color: #323d4e !important;
+  color: white !important;
+}
+
+.el-select-dropdown__item:hover {
+  background-color: #374a6f !important;
+}
+
+.el-select-dropdown {
+  background-color: #323d4e !important;
+  border: none !important;
+}
+
+.el-popper[x-placement^='bottom'] .popper__arrow {
+  display: none !important;
+}
+
+.dashboard__dropdown {
+  @apply w-[100%] py-[12px] pl-[15px] flex justify-start space-x-[15px] rounded-lg text-textGray focus:text-white hover:text-white;
+}
+
+.dashboard__dropdown.active {
+  @apply text-white bg-[#4880FF];
+}
+
+.header {
+  @apply flex flex-col space-y-[40px] bg-navbar p-[25px] rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px];
+}
+
+.header__block {
+  @apply flex items-center justify-between;
+}
+
+.header__title {
+  @apply text-[28px] font-bold;
+}
+
+.header__btn {
+  @apply flex items-center space-x-[3px] bg-[#4379EE] py-[10px] px-[18px] rounded-lg shadow-[rgba(72,128,255,0.24)_0px_3px_8px] hover:bg-[#5f92ff] transition-all duration-200;
+}
+
+.el-pagination.is-background .btn-prev:disabled {
+  background-color: #323d4e !important;
+}
+
+.el-pagination.is-background .btn-prev {
+  background-color: #323d4e !important;
+}
+
+.el-pagination.is-background .btn-next {
+  background-color: #323d4e !important;
+}
+
+.el-pagination.is-background .btn-next:disabled {
+  background-color: #323d4e !important;
+}
+
+.el-input__inner {
+  background-color: #323d4e !important;
+  color: white !important;
+  height: 46px !important;
+  outline: none !important;
+  border: 0.1px solid !important;
+  border-radius: 0.5rem !important;
+}
+
+.el-input__inner:focus {
+  outline: none !important;
+}
+
+.el-select-dropdown__item {
+  background-color: #323d4e !important;
+  color: white !important;
+}
+
+.el-select-dropdown__item:hover {
+  background-color: #374a6f !important;
+}
+
+.el-select-dropdown {
+  background-color: #323d4e !important;
+  border: none !important;
+}
+
+.el-popper[x-placement^='bottom'] .popper__arrow {
+  display: none !important;
+}
+
+.cart {
+  @apply flex justify-between space-x-[15px] 2xl:space-x-[30px] 2xl:px-[40px] py-[30px];
+}
+
+.cart__block {
+  @apply flex flex-col space-y-[10px] bg-[#323d4e] rounded-lg pt-[20px] pb-[30px] px-[18px] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px];
+}
+
+.cart__block_lang {
+  @apply flex flex-col space-y-[10px] bg-[#323d4e] rounded-tr-lg rounded-b-lg pt-[20px] pb-[30px] px-[18px] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px];
+}
+
+.cart__block-title {
+  @apply font-medium text-[20px];
+}
+
+#cart .el-form-item__label {
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+.cart__container {
+  @apply flex flex-col space-y-[30px];
+}
+
+.ql-snow .ql-stroke {
+  stroke: white !important;
+}
+
+.ql-snow .ql-fill {
+  stroke: white !important;
+}
+
+.ql-snow .ql-picker {
+  color: white !important;
+}
+
+.ql-container.ql-snow {
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.ql-toolbar.ql-snow {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+  border: 0.1px solid white !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: #c0c4cc !important;
+}
+
+.ql-container {
+  height: 200px !important;
+  border: 0.1px solid white !important;
+}
+
+.ql-picker-item {
+  color: #1b2431 !important;
+}
+
+.cancel-btn {
+  @apply bg-[#e1f0ff] text-blue py-[8px] px-[16px] rounded-lg hover:bg-blue hover:text-white transition-all duration-200;
+}
+
+.icon-plus:hover path {
+  stroke: white;
+}
+
+.header__lang-title {
+  @apply text-[16px];
+}
+
+.header__lang-title:not(:last-child) {
+  border-right: 1px solid #a1a5bf;
+  padding-right: 20px;
+}
+
+.header__lang {
+  @apply w-[184px] py-[10px] px-[18px] rounded-t-lg flex justify-between bg-[#323d4e];
+}
+
+#card .el-select {
+  width: 85% !important;
+}
+
+.el-notification {
+  top: 85px !important;
+  z-index: 999999 !important;
+}
