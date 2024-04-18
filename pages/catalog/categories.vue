@@ -53,7 +53,7 @@
               <div class="flex items-center space-x-[15px]">
                 <img
                   class="img-box w-[50px] h-[50px] rounded-lg object-cover"
-                  src="@/assets/img/png/test-product.png"
+                  :src="item.md_img || require('@/assets/img/png/empty.png')"
                   alt=""
                 />
 
@@ -72,7 +72,7 @@
             <td class="tbody__td">
               <img
                 class="m-auto rounded-full w-[40px] h-[40px]"
-                src="@/assets/img/png/empty-category-status.png"
+                src="@/assets/img/png/empty.png"
                 alt=""
               />
             </td>
@@ -174,6 +174,7 @@ export default {
   },
   mounted() {
     this.fetchCategories()
+    console.log(this.categories)
   },
   methods: {
     async fetchCategories() {

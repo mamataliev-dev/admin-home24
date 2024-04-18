@@ -7,7 +7,7 @@
           0 4px 6px -2px rgba(0, 0, 0, 0.05);
       "
     >
-      <el-dropdown>
+      <el-dropdown @command="logOut">
         <span class="el-dropdown-link">
           <button class="flex justify-end">
             <svg
@@ -77,7 +77,7 @@
         </span>
 
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item @click="logOut">
+          <el-dropdown-item>
             <span>Log out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -90,14 +90,21 @@
 export default {
   methods: {
     async logOut() {
+      console.log('clicked')
+
       try {
-        const response = await this.axiosURL.post('/auth/logout', {
+        const token = localStorage.getItem('admin-token')
+        await this.$axiosURL.post('/auth/logout', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${token}`,
           },
         })
-        console.log(response)
+
+        localStorage.removeItem('admin-token')
+        this.$router.push('/login')
+        console.log('log out')
       } catch (error) {
+        localStorage.removeItem('admin-token')
         console.error(error)
       }
     },

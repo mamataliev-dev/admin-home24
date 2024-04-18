@@ -3,6 +3,8 @@ export const state = () => ({
   categories: null,
   attributes: null,
   characteristics: null,
+  orders: [],
+  ordersCounts: null,
 })
 
 export const mutations = {
@@ -20,6 +22,14 @@ export const mutations = {
 
   setCharacteristics(state, value) {
     state.characteristics = value
+  },
+
+  setOrders(state, value) {
+    state.orders = value
+  },
+
+  setOrdersCounts(state, value) {
+    state.ordersCounts = value
   },
 }
 
@@ -39,7 +49,6 @@ export const actions = {
     try {
       const response = await this.$axiosURL.get('/categories')
       commit('setCategories', response.data)
-      console.log(response.data)
     } catch (error) {
       throw Error
     }
@@ -60,6 +69,26 @@ export const actions = {
     try {
       const response = await this.$axiosURL.get('/characteristics/all')
       commit('setCharacteristics', response.data)
+    } catch (error) {
+      throw Error
+    }
+  },
+
+  // Get Orders
+  async fetchOrders({ commit }) {
+    try {
+      const response = await this.$axiosURL.get('/orders')
+      commit('setOrders', response.data.orders.data)
+    } catch (error) {
+      throw Error
+    }
+  },
+
+  // Get Orders Counts
+  async fetchOrdersCounts({ commit }, state) {
+    try {
+      const response = await this.$axiosURL.get('/orders/counts')
+      commit('setOrdersCounts', response.data.counts)
     } catch (error) {
       throw Error
     }

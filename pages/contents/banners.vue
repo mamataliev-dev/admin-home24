@@ -40,7 +40,7 @@
             <td class="tbody__td">
               <img
                 class="img-box w-[50px] h-[50px] border border-[#ebeef5] rounded-lg"
-                :src="item.md_m_img.ru"
+                :src="item.md_m_img.ru || '@/assets/img/png/empty.png'"
                 alt=""
               />
             </td>
@@ -225,7 +225,7 @@ export default {
         this.loading = false
       }
     },
-    
+
     editProduct() {},
 
     removeProduct() {},

@@ -38,7 +38,7 @@
               <div class="flex items-center space-x-[15px]">
                 <img
                   class="w-[50px] h-[50px] border border-[#ebeef5] rounded-lg"
-                  src="@/assets/img/png/empty-category-status.png"
+                  src="@/assets/img/png/empty.png"
                   alt=""
                 />
                 <span class="font-semibold text-[17px]">Blog title</span>

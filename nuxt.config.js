@@ -44,11 +44,6 @@ export default {
     port: 8000,
   },
 
-  // pageTransition: {
-  //   name: 'page',
-  //   mode: 'out-in',
-  // },
-
   // router: {
   //   middleware: ['auth'],
   // },

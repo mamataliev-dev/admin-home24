@@ -96,7 +96,10 @@
               <div class="flex items-center space-x-[15px]">
                 <img
                   class="img-box w-[50px] h-[50px] rounded-lg object-cover"
-                  :src="item?.products[0]?.images[0].md_img"
+                  :src="
+                    item?.products[0]?.images[0].md_img ||
+                    require('@/assets/img/png/empty.png')
+                  "
                   alt=""
                 />
 
@@ -163,11 +166,22 @@
               </div>
             </td>
           </tr>
+
+          <tr v-if="products?.length === 0" class="relative h-[250px]">
+            <EmptyData />
+          </tr>
         </tbody>
       </table>
 
       <div class="flex justify-end mt-[30px]">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="pagination.total"
+          :current-page.sync="pagination.current_page"
+          :page-size="pagination.per_page"
+          @current-change="handlePageChange"
+        >
         </el-pagination>
       </div>
     </div>
@@ -180,6 +194,11 @@ export default {
     return {
       loading: false,
       products: null,
+      pagination: {
+        total: 0,
+        per_page: 0,
+        current_page: 0,
+      },
       query: '',
       stocks: [
         {
@@ -214,21 +233,55 @@ export default {
       title: 'Продукты',
     }
   },
+  watch: {
+    $route: {
+      handler: 'fetchProducts',
+      immediate: true,
+    },
+  },
   mounted() {
     this.fetchProducts()
+
+    this.$router.push({
+      query: {
+        page: 1,
+        per_page: 16,
+      },
+    })
   },
   methods: {
     async fetchProducts() {
       this.loading = true
+
       try {
-        const response = await this.$axiosURL.get('/products')
+        const page = this.$route.query.page || 1
+        const perPage = this.$route.query.perPage || 16
+
+        const response = await this.$axiosURL.get(
+          `/products?page=${page}&per_page=${perPage}`
+        )
+
         this.products = response.data.products.data
-        console.log(response.data.products.data)
+
+        this.pagination = {
+          total: response.data.products.total,
+          per_page: response.data.products.per_page,
+          current_page: response.data.products.current_page,
+        }
       } catch (error) {
         throw Error
       } finally {
         this.loading = false
       }
+    },
+
+    handlePageChange(page) {
+      this.$router.push({
+        query: {
+          page: this.pagination.current_page,
+          per_page: this.pagination.per_page,
+        },
+      })
     },
 
     truncatedName(text) {

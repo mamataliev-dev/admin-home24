@@ -12,19 +12,19 @@
         <!-- Orders by today -->
         <div class="item__block">
           <span class="item__text">Количество заказов на сегодня</span>
-          <span class="item__number">0</span>
+          <span class="item__number">{{ dashboard?.today_orders_amount }}</span>
         </div>
 
         <!-- Orders sum by today -->
         <div class="item__block">
           <span class="item__text">Сумма заказов на сегодня</span>
-          <span class="item__number">0</span>
+          <span class="item__number">{{ dashboard?.today_orders_count }}</span>
         </div>
 
         <!-- New user by today -->
         <div class="item__block">
           <span class="item__text">Новый пользователь на сегодня</span>
-          <span class="item__number">0</span>
+          <span class="item__number">{{ dashboard?.today_users_count }}</span>
         </div>
 
         <!-- Total orders -->
@@ -36,7 +36,7 @@
         <!-- Orders sum by all time -->
         <div class="item__block_under">
           <span class="item__text_under">Сумма заказов на вес период</span>
-          <span class="item__number_under">0</span>
+          <span class="item__number_under">{{ dashboard?.orders_amount }}</span>
         </div>
 
         <!-- Sum users -->
@@ -51,43 +51,43 @@
         <!-- New -->
         <div class="status__item">
           <span class="text-xl text-[#18b3bd]">Новые</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.new }}</span>
         </div>
 
         <!-- Accepted -->
         <div class="status__item">
           <span class="text-xl text-[#3699ff]">Принятые</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.accepted }}</span>
         </div>
 
         <!-- Pending -->
         <div class="status__item">
           <span class="text-xl text-[#ffa909]">Ожидание</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.pending }}</span>
         </div>
 
         <!-- In delivery -->
         <div class="status__item">
           <span class="text-xl text-[#62cacf]">В Доставке</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.on_the_way }}</span>
         </div>
 
         <!-- Devlivered -->
         <div class="status__item">
           <span class="text-xl text-[#48a377]">Доставленные</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.done }}</span>
         </div>
 
         <!-- Cenceled -->
         <div class="status__item">
           <span class="text-xl text-[#f31212]">Отмененные</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.canceled }}</span>
         </div>
 
         <!-- Refund -->
         <div class="status__item">
           <span class="text-xl text-[#ad00c9]">Возврат</span>
-          <span class="text-2xl">0</span>
+          <span class="text-2xl">{{ ordersCounts?.returned }}</span>
         </div>
       </div>
     </div>
@@ -107,17 +107,29 @@ export default {
       title: 'Dashboard',
     }
   },
+  computed: {
+    orders() {
+      return this.$store.state.orders
+    },
+    ordersCounts() {
+      return this.$store.state.ordersCounts
+    },
+  },
   mounted() {
-    this.fetchDashboard()
+    this.asyncFunctions()
   },
   methods: {
+    async asyncFunctions() {
+      await this.fetchDashboard()
+      await this.$store.dispatch('fetchOrders')
+      await this.$store.dispatch('fetchOrdersCounts')
+    },
+
     async fetchDashboard() {
       this.loading = true
       try {
         const response = await this.$axiosURL('/dashboard')
-
         this.dashboard = response.data
-        console.log(response.data)
       } catch (error) {
         throw Error
       } finally {

@@ -155,7 +155,7 @@
                 to="/orders/all-orders"
               >
                 <span>&#9679;</span>
-                <span>Все заказы (5)</span>
+                <span>Все заказы ({{ orders.length }})</span>
               </nuxt-link>
             </li>
 
@@ -166,7 +166,7 @@
                 to="/orders/new-orders"
               >
                 <span>&#9679;</span>
-                <span>Новые заказы (5)</span>
+                <span>Новые заказы ({{ ordersCounts?.new }})</span>
               </nuxt-link>
             </li>
 
@@ -177,7 +177,7 @@
                 to="/orders/accepted-orders"
               >
                 <span>&#9679;</span>
-                <span>Принятые заказы (5)</span>
+                <span>Принятые заказы ({{ ordersCounts?.accepted }})</span>
               </nuxt-link>
             </li>
 
@@ -188,7 +188,7 @@
                 to="/orders/pending-orders"
               >
                 <span>&#9679;</span>
-                <span>Ожидание (5)</span>
+                <span>Ожидание ({{ ordersCounts?.pending }})</span>
               </nuxt-link>
             </li>
 
@@ -199,7 +199,7 @@
                 to="/orders/delivery-orders"
               >
                 <span>&#9679;</span>
-                <span>В доставке (5)</span>
+                <span>В доставке ({{ ordersCounts?.on_the_way }})</span>
               </nuxt-link>
             </li>
 
@@ -210,7 +210,7 @@
                 to="/orders/returned-orders"
               >
                 <span>&#9679;</span>
-                <span>Возврат (5)</span>
+                <span>Возврат ({{ ordersCounts?.returned }})</span>
               </nuxt-link>
             </li>
 
@@ -221,7 +221,7 @@
                 to="/orders/delivered-orders"
               >
                 <span>&#9679;</span>
-                <span>Доставленные (5)</span>
+                <span>Доставленные ({{ ordersCounts?.done }})</span>
               </nuxt-link>
             </li>
 
@@ -232,7 +232,7 @@
                 to="/orders/canceled-orders"
               >
                 <span>&#9679;</span>
-                <span>Отмененные (5)</span>
+                <span>Отмененные ({{ ordersCounts?.canceled }})</span>
               </nuxt-link>
             </li>
 
@@ -497,16 +497,30 @@ export default {
       showcases: null,
     }
   },
+  computed: {
+    orders() {
+      return this.$store.state.orders
+    },
+    ordersCounts() {
+      return this.$store.state.ordersCounts
+    },
+  },
   watch: {
     $route() {
       this.checkRoute()
     },
   },
   mounted() {
-    this.checkRoute()
-    this.fetchShowcases()
+    this.asyncFunctions()
   },
   methods: {
+    async asyncFunctions() {
+      await this.$store.dispatch('fetchOrders')
+      await this.$store.dispatch('fetchOrdersCounts')
+      await this.fetchShowcases()
+      this.checkRoute()
+    },
+
     async fetchShowcases() {
       try {
         const response = await this.$axiosURL('/showcases/all')
@@ -515,9 +529,11 @@ export default {
         throw Error
       }
     },
+
     toggleDropdown(menu) {
       this.openList = this.openList === menu ? null : menu
     },
+
     checkRoute() {
       const pathSegments = this.$route.path.split('/').filter((p) => p)
       if (pathSegments.length) {
@@ -525,14 +541,17 @@ export default {
         this.activeChild = pathSegments[1] || null
       }
     },
+
     beforeEnter(el) {
       el.style.height = '0'
     },
+
     enter(el, done) {
       el.style.transition = 'height 0.3s ease'
       el.style.height = el.scrollHeight + 'px'
       el.addEventListener('transitionend', done)
     },
+
     leave(el, done) {
       el.style.height = '0'
       el.addEventListener('transitionend', done)

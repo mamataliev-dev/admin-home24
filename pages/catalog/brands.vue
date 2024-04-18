@@ -59,7 +59,7 @@
               <div class="flex items-center space-x-[15px]">
                 <img
                   class="img-box w-[40px] h-[40px] rounded-lg"
-                  :src="item.md_logo"
+                  :src="item.md_logo || require('@/assets/img/png/empty.png')"
                   alt=""
                 />
                 <span class="font-semibold">{{ item.name }}</span>
