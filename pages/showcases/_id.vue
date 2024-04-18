@@ -1,8 +1,10 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
-        <h1 class="header__title">TEST</h1>
+        <h1 class="header__title">{{ showcase?.name.ru }}</h1>
 
         <button class="header__btn" @click="$router.push('/add-product')">
           <img src="@/assets/img/icons/add.svg" alt="" />
@@ -49,14 +51,17 @@
         </thead>
 
         <Draggable
-          v-model="list"
           group="items"
           :options="dragOptions"
           tag="tbody"
           @start="dragging = true"
           @end="dragging = false"
         >
-          <tr v-for="item in list" :key="item.id" class="tbody_tr">
+          <tr
+            v-for="item in showcase?.products"
+            :key="item.id"
+            class="tbody_tr"
+          >
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px] cursor-pointer"
@@ -93,10 +98,9 @@
             <td class="tbody__td flex space-x-[15px]">
               <img
                 class="w-[50px] h-[50px] rounded-lg border border-textGray object-cover"
-                :src="item.image"
-                :alt="item.name"
+                :src="item.images[0].md_img"
               />
-              <span class="font-semibold">{{ item.name }}</span>
+              <span class="font-semibold">{{ item.name.ru }}</span>
             </td>
 
             <!-- Actions -->
@@ -119,10 +123,17 @@
               </div>
             </td>
           </tr>
+
+          <tr v-if="showcase?.products.length === 0" class="relative h-[250px]">
+            <EmptyData />
+          </tr>
         </Draggable>
       </table>
 
-      <div class="flex justify-end mt-[30px]">
+      <div
+        v-if="showcase?.products.length !== 0"
+        class="flex justify-end mt-[30px]"
+      >
         <el-pagination background layout="prev, pager, next" :total="1000">
         </el-pagination>
       </div>
@@ -134,25 +145,9 @@
 export default {
   data() {
     return {
-      list: [
-        {
-          id: 1,
-          name: 'Apple iPhone 15 128GB Blue',
-          image:
-            'https://api.home24.uz/uploads/products/200/oRM6xrY9OVsrwBdL.jpg',
-        },
-        {
-          id: 2,
-          name: 'Samsung Galaxy S22 256GB Black',
-          image: 'https://api.example.com/uploads/products/200/samsung.jpg',
-        },
-        {
-          id: 3,
-          name: 'Google Pixel 6 128GB Sorta Seafoam',
-          image: 'https://api.example.com/uploads/products/200/pixel.jpg',
-        },
-      ],
+      loading: false,
       dragging: false,
+      showcase: null,
     }
   },
   head() {
@@ -172,7 +167,25 @@ export default {
       }
     },
   },
+  mounted() {
+    this.fetchCurrentShowcase()
+  },
   methods: {
+    async fetchCurrentShowcase() {
+      this.loading = true
+      try {
+        const repsonse = await this.$axiosURL.get(
+          `/showcases/${this.$route.params.id}`
+        )
+        this.showcase = repsonse.data.showcase
+        console.log(repsonse.data.showcase)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     removeProduct() {},

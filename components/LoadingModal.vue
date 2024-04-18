@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isLoading"
-    class="blackout fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center"
+    class="blackout fixed inset-0 bg-black flex justify-center items-center"
   >
     <div
       class="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-blue"

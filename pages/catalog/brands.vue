@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Брэнды</h1>
@@ -44,7 +46,7 @@
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in brands" :key="index" class="tbody_tr">
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
@@ -56,11 +58,11 @@
             <td class="tbody__td">
               <div class="flex items-center space-x-[15px]">
                 <img
-                  class="w-[40px] h-[40px] rounded-lg"
-                  src="@/assets/img/png/empty-category-status.png"
+                  class="img-box w-[40px] h-[40px] rounded-lg"
+                  :src="item.md_logo"
                   alt=""
                 />
-                <span class="font-semibold">brand name</span>
+                <span class="font-semibold">{{ item.name }}</span>
               </div>
             </td>
 
@@ -99,7 +101,6 @@
         title="Добавить брэнд"
         :visible.sync="dialogVisible"
         width="520px"
-        :before-close="handleClose"
       >
         <!-- Brand Name -->
         <el-form
@@ -213,6 +214,8 @@
 export default {
   data() {
     return {
+      loading: false,
+      brands: null,
       dialogImageUrl: '',
       dialogVisible: false,
       disabled: false,
@@ -235,7 +238,22 @@ export default {
       title: 'Брэнды',
     }
   },
+  mounted() {
+    this.fetchBrands()
+  },
   methods: {
+    async fetchBrands() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/brands/all')
+        this.brands = response.data.brands
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     removeProduct() {},

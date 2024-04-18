@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Атрибуты</h1>
@@ -38,8 +40,8 @@
         <thead class="table__thead">
           <tr>
             <th class="table__tr_border-l text-start">АТРИБУТЫ</th>
-            <th class="table__tr">ПАРАМЕТРЫ</th>
-            <th class="table__tr">КАТЕГОРИИ</th>
+            <th class="table__tr text-center">ПАРАМЕТРЫ</th>
+            <th class="table__tr text-center">КАТЕГОРИИ</th>
             <th class="table__tr_border-r text-end pr-[40px]">ДЕЙСТВИЯ</th>
           </tr>
         </thead>
@@ -128,42 +130,30 @@
             </td>
           </tr>
 
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in attributes" :key="index" class="tbody_tr">
             <!-- Attribute -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
               <div class="flex flex-col space-y-[10px]">
-                <span class="text-white text-[15px] font-semibold">Camera</span>
-                <span class="font-medium text-textGray">Camera</span>
+                <span class="text-white text-[15px] font-semibold">{{
+                  item.name.ru
+                }}</span>
+                <span class="font-medium text-textGray">{{
+                  item.name.ru
+                }}</span>
               </div>
             </td>
 
-            <!-- Settings -->
+            <!-- Options -->
             <td class="tbody__td tbody__td_center">
               <div class="flex justify-center space-x-[5px]">
                 <div
+                  v-for="elem in item.options.slice(1, 4)"
+                  :key="elem.id"
                   class="bg-[#eff2f5] text-[#6c7b9a] rounded-lg py-[4px] px-[10px]"
                 >
-                  Apple
-                </div>
-
-                <div
-                  class="bg-[#eff2f5] text-[#6c7b9a] rounded-lg py-[4px] px-[10px]"
-                >
-                  Samsung
-                </div>
-
-                <div
-                  class="bg-[#eff2f5] text-[#6c7b9a] rounded-lg py-[4px] px-[10px]"
-                >
-                  Artel
-                </div>
-
-                <div
-                  class="bg-[#eff2f5] text-[#6c7b9a] rounded-lg py-[4px] px-[10px]"
-                >
-                  Apple
+                  {{ elem.name.ru }}
                 </div>
               </div>
             </td>
@@ -232,6 +222,8 @@
 export default {
   data() {
     return {
+      loading: false,
+      attributes: null,
       query: '',
     }
   },
@@ -240,7 +232,23 @@ export default {
       title: 'Атрибуты',
     }
   },
+  mounted() {
+    this.fetchAttributes()
+  },
   methods: {
+    async fetchAttributes() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/attributes/all')
+        this.attributes = response.data.attributes
+        console.log(response.data.attributes)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     removeProduct() {},

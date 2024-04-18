@@ -39,12 +39,13 @@ export const actions = {
     try {
       const response = await this.$axiosURL.get('/categories')
       commit('setCategories', response.data)
+      console.log(response.data)
     } catch (error) {
       throw Error
     }
   },
 
-  // Get Attributes
+  // Get Attributdes
   async fetchAttributes({ commit }) {
     try {
       const response = await this.$axiosURL.get('/attributes/all')

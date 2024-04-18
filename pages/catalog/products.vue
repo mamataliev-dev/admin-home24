@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Продукты</h1>
@@ -73,55 +75,72 @@
           <tr>
             <th class="table__tr_border-l text-start">№</th>
             <th class="table__tr text-start">ПРОДУКТ</th>
-            <th class="table__tr">КОЛ-ВО</th>
-            <th class="table__tr">ЦЕНА</th>
-            <th class="table__tr">СТАТУС</th>
-            <th class="table__tr_border-r">ДЕЙСТВИЯ</th>
+            <th class="table__tr text-center">КОЛ-ВО</th>
+            <th class="table__tr text-center">ЦЕНА</th>
+            <th class="table__tr text-center">СТАТУС</th>
+            <th class="table__tr_border-r text-center">ДЕЙСТВИЯ</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in products" :key="index" class="tbody_tr">
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
-              #{{ index }}
+              #{{ ++index }}
             </td>
 
             <!-- Product -->
             <td class="tbody__td">
               <div class="flex items-center space-x-[15px]">
                 <img
-                  class="border border-[rgb(235,238,244)] w-[50px] h-[50px] rounded-lg object-cover"
-                  src="@/assets/img/png/test-product.png"
+                  class="img-box w-[50px] h-[50px] rounded-lg object-cover"
+                  :src="item?.products[0]?.images[0].md_img"
                   alt=""
                 />
 
                 <div class="flex flex-col space-y-[3px]">
-                  <span class="text-[15px] font-semibold">Product Title</span>
-                  <span class="font-regular text-textGray"
-                    >Product Category Path</span
-                  >
+                  <span class="w-[250px] text-[15px] font-semibold">{{
+                    truncatedName(item?.products[0]?.name.ru)
+                  }}</span>
+                  <span class="font-regular text-textGray">{{
+                    getCategoryPath(item.category)
+                  }}</span>
                 </div>
               </div>
             </td>
 
             <!-- Quantity -->
             <td class="tbody__td tbody__td_center">
-              <span class="font-semibold">5</span>
+              <span class="font-semibold"
+                >{{ item?.products[0]?.stock || 0 }}
+              </span>
             </td>
 
             <!-- Price -->
             <td class="tbody__td tbody__td_center">
-              <span class="font-semibold">360$</span>
+              <span class="font-semibold"
+                >{{ formattedPrice(item?.products[0]?.price) || 0 }} сум</span
+              >
             </td>
 
             <!-- Status -->
             <td class="tbody__td tbody__td_center">
-              <span class="bg-[#00B69B] rounded-lg px-[16px] py-[8px]"
-                >Активный</span
+              <span
+                :class="
+                  item?.products[0]?.status === 'active'
+                    ? 'bg-[#00B69B]'
+                    : 'bg-[#EF3826]'
+                "
+                class="rounded-lg px-[16px] py-[8px]"
               >
+                {{
+                  item?.products[0]?.status === 'active'
+                    ? 'Активный'
+                    : 'Неактивный'
+                }}
+              </span>
             </td>
 
             <!-- Actions -->
@@ -159,6 +178,8 @@
 export default {
   data() {
     return {
+      loading: false,
+      products: null,
       query: '',
       stocks: [
         {
@@ -193,7 +214,56 @@ export default {
       title: 'Продукты',
     }
   },
+  mounted() {
+    this.fetchProducts()
+  },
   methods: {
+    async fetchProducts() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/products')
+        this.products = response.data.products.data
+        console.log(response.data.products.data)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    truncatedName(text) {
+      const maxLength = 50
+      if (text?.length > maxLength) {
+        return text.substring(0, maxLength) + '...'
+      }
+      return text
+    },
+
+    formattedPrice(val) {
+      const text = val?.toString()
+
+      const formatted = text
+        ?.split('')
+        .reverse()
+        .join('')
+        .match(/.{1,3}/g)
+        .join(' ')
+        .split('')
+        .reverse()
+        .join('')
+
+      return formatted
+    },
+
+    getCategoryPath(category) {
+      let path = category.name.ru
+      while (category.parent) {
+        category = category.parent
+        path = category.name.ru + ' / ' + path
+      }
+      return path
+    },
+
     editProduct() {},
 
     removeProduct() {},

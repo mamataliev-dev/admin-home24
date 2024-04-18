@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Баннеры</h1>
@@ -26,31 +28,31 @@
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in banners" :key="index" class="tbody_tr">
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
-              #{{ index + 1 }}
+              #{{ ++index }}
             </td>
 
             <!-- Image -->
             <td class="tbody__td">
               <img
-                class="w-[50px] h-[50px] border border-[#ebeef5] rounded-lg"
-                src="@/assets/img/png/empty-category-status.png"
+                class="img-box w-[50px] h-[50px] border border-[#ebeef5] rounded-lg"
+                :src="item.md_m_img.ru"
                 alt=""
               />
             </td>
 
             <!-- Link -->
             <td class="tbody__td text-center">
-              <span class="font-bold">https://uzum.uz/ru</span>
+              <span class="font-bold">{{ item.link.ru }}</span>
             </td>
 
             <!-- Type -->
             <td class="tbody__td text-center">
-              <span class="font-bold">Баннер категории</span>
+              <span class="font-bold">{{ item.type }}</span>
             </td>
 
             <!-- Actions -->
@@ -83,14 +85,13 @@
     </div>
 
     <!-- Add Brand Modal -->
-    <div>
+    <!-- <div>
       <el-dialog
         title="Добавить брэнд"
         :visible.sync="dialogVisible"
         width="520px"
         :before-close="handleClose"
       >
-        <!-- Brand Name -->
         <el-form
           :model="dynamicValidateForm"
           ref="dynamicValidateForm"
@@ -108,13 +109,11 @@
           </el-form-item>
         </el-form>
 
-        <!-- Is Popular -->
         <div class="flex space-x-[20px] mt-[40px]">
           <el-switch v-model="isPopular"> </el-switch>
           <span class="font-semibold text-white">Популярные бренды</span>
         </div>
 
-        <!-- Image -->
         <div class="mt-[30px]">
           <el-upload list-type="picture-card" :auto-upload="false">
             <div class="pt-[40px]">
@@ -158,7 +157,6 @@
           </el-upload>
         </div>
 
-        <!-- Cancel / Add -->
         <div
           class="flex justify-end space-x-[15px] mt-[30px] pt-[15px] border-t border-[#e8e8e8]"
         >
@@ -194,21 +192,40 @@
           </button>
         </div>
       </el-dialog>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {}
+    return {
+      loading: false,
+      banners: null,
+    }
   },
   head() {
     return {
       title: 'Баннеры',
     }
   },
+  mounted() {
+    this.fetchBanners()
+  },
   methods: {
+    async fetchBanners() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/banners')
+        this.banners = response.data.banners.data
+        console.log(response.data.banners.data)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+    
     editProduct() {},
 
     removeProduct() {},

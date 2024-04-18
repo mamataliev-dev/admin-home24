@@ -59,7 +59,7 @@
 
 <script>
 export default {
-  layout: 'login-layout',
+  layout: 'empty',
   data() {
     return {
       login: '',

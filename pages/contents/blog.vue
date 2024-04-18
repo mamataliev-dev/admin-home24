@@ -80,17 +80,15 @@
     </div>
 
     <!-- Add Brand Modal -->
-    <div>
+    <!-- <div>
       <el-dialog
         title="Добавить брэнд"
         :visible.sync="dialogVisible"
         width="520px"
-        :before-close="handleClose"
       >
-        <!-- Brand Name -->
         <el-form
-          :model="dynamicValidateForm"
           ref="dynamicValidateForm"
+          :model="dynamicValidateForm"
           class="demo-dynamic"
         >
           <el-form-item
@@ -105,13 +103,11 @@
           </el-form-item>
         </el-form>
 
-        <!-- Is Popular -->
         <div class="flex space-x-[20px] mt-[40px]">
           <el-switch v-model="isPopular"> </el-switch>
           <span class="font-semibold text-white">Популярные бренды</span>
         </div>
 
-        <!-- Image -->
         <div class="mt-[30px]">
           <el-upload list-type="picture-card" :auto-upload="false">
             <div class="pt-[40px]">
@@ -155,7 +151,7 @@
           </el-upload>
         </div>
 
-        <!-- Cancel / Add -->
+
         <div
           class="flex justify-end space-x-[15px] mt-[30px] pt-[15px] border-t border-[#e8e8e8]"
         >
@@ -191,20 +187,24 @@
           </button>
         </div>
       </el-dialog>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {}
+    return {
+      dialogVisible: false,
+      isPopular: null,
+    }
   },
   head() {
     return {
       title: 'Блог',
     }
   },
+  mounted() {},
   methods: {
     editProduct() {},
 

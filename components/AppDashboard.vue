@@ -87,7 +87,11 @@
       <!-- Dashboard -->
       <li>
         <button @click="toggleDropdown('dashboard')">
-          <nuxt-link class="dashboard-link" to="/dashboard">
+          <nuxt-link
+            :class="openList === 'dashboard' ? 'active' : ''"
+            class="dashboard-link"
+            to="/dashboard"
+          >
             <span>Dashboard</span>
           </nuxt-link>
         </button>
@@ -113,14 +117,14 @@
           @leave="leave"
         >
           <ol v-show="openList === 'showcases'" class="pl-[5px]">
-            <li>
+            <li v-for="item in showcases" :key="item.id">
               <nuxt-link
-                :class="activeChild === '1' ? 'active' : ''"
+                :class="activeChild === item.id ? 'active' : ''"
                 class="dashboard__dropdown"
-                :to="`/showcases/${1}`"
+                :to="`/showcases/${item.id}`"
               >
                 <span>&#9679;</span>
-                <span>TEST</span>
+                <span>{{ item.name.ru }}</span>
               </nuxt-link>
             </li>
           </ol>
@@ -302,7 +306,11 @@
       <!-- Clients -->
       <li>
         <button @click="toggleDropdown('clients')">
-          <nuxt-link class="dashboard-link" to="/clients">
+          <nuxt-link
+            :class="openList === 'clients' ? 'active' : ''"
+            class="dashboard-link"
+            to="/clients"
+          >
             <span :class="{ 'text-white': openList === 'clients' }"
               >Клиенты</span
             >
@@ -486,6 +494,7 @@ export default {
     return {
       openList: null,
       activeChild: null,
+      showcases: null,
     }
   },
   watch: {
@@ -495,8 +504,17 @@ export default {
   },
   mounted() {
     this.checkRoute()
+    this.fetchShowcases()
   },
   methods: {
+    async fetchShowcases() {
+      try {
+        const response = await this.$axiosURL('/showcases/all')
+        this.showcases = response.data.showcases
+      } catch (error) {
+        throw Error
+      }
+    },
     toggleDropdown(menu) {
       this.openList = this.openList === menu ? null : menu
     },
@@ -528,10 +546,15 @@ export default {
   @apply w-[190px] flex items-center justify-between text-textGray font-semibold py-[16px] px-[10px] text-start rounded-lg  transition-all duration-150 hover:text-white focus:text-white;
 }
 
+.dashboard-link.active {
+  @apply text-white bg-[#4880FF];
+}
+
 .dropdown-enter-active,
 .dropdown-leave-active {
   overflow: hidden;
 }
+
 .dropdown-enter,
 .dropdown-leave-to {
   height: 0;

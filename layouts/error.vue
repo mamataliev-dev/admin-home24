@@ -25,6 +25,6 @@
 
 <script>
 export default {
-  layout: 'login-layout',
+  layout: 'empty',
 }
 </script>

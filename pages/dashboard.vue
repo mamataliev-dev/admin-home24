@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <h1 class="header__title">Dashboard</h1>
     </div>
@@ -10,37 +12,37 @@
         <!-- Orders by today -->
         <div class="item__block">
           <span class="item__text">Количество заказов на сегодня</span>
-          <span class="item__number">40,689</span>
+          <span class="item__number">0</span>
         </div>
 
         <!-- Orders sum by today -->
         <div class="item__block">
           <span class="item__text">Сумма заказов на сегодня</span>
-          <span class="item__number">40,689</span>
+          <span class="item__number">0</span>
         </div>
 
         <!-- New user by today -->
         <div class="item__block">
           <span class="item__text">Новый пользователь на сегодня</span>
-          <span class="item__number">40,689</span>
+          <span class="item__number">0</span>
         </div>
 
         <!-- Total orders -->
         <div class="item__block_under">
           <span class="item__text_under">Всего заказов</span>
-          <span class="item__number_under">40,689</span>
+          <span class="item__number_under">{{ dashboard?.orders_count }}</span>
         </div>
 
         <!-- Orders sum by all time -->
         <div class="item__block_under">
           <span class="item__text_under">Сумма заказов на вес период</span>
-          <span class="item__number_under">40,689</span>
+          <span class="item__number_under">0</span>
         </div>
 
         <!-- Sum users -->
         <div class="item__block_under">
           <span class="item__text_under">Количество пользователей</span>
-          <span class="item__number_under">40,689</span>
+          <span class="item__number_under">{{ dashboard?.users_count }}</span>
         </div>
       </div>
 
@@ -94,24 +96,41 @@
 
 <script>
 export default {
+  data() {
+    return {
+      loading: false,
+      dashboard: null,
+    }
+  },
   head() {
     return {
       title: 'Dashboard',
     }
   },
-  // mounted() {
-  //   const response = this.$axiosURL.post('/auth/me', {
-  //     headers: {
-  //       Authorization: `${localStorage.getItem('admin-token')}`,
-  //     },
-  //   })
-  // },
+  mounted() {
+    this.fetchDashboard()
+  },
+  methods: {
+    async fetchDashboard() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL('/dashboard')
+
+        this.dashboard = response.data
+        console.log(response.data)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 }
 </script>
 
 <style scoped>
 .item__block {
-  @apply h-[130px] flex flex-col space-y-[15px] items-start p-[16px] bg-navbar rounded-lg relative;
+  @apply h-[130px] flex flex-col space-y-[15px] items-start p-[16px] bg-navbar rounded-lg relative shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px];
 }
 
 .item__text {
@@ -135,6 +154,6 @@ export default {
 }
 
 .status__item {
-  @apply flex flex-col p-[18px] bg-navbar rounded-lg items-start space-y-[20px];
+  @apply flex flex-col p-[18px] bg-navbar rounded-lg items-start space-y-[20px] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px];
 }
 </style>

@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Aкции</h1>
@@ -15,24 +17,41 @@
       <table class="table__container">
         <thead class="table__thead">
           <tr>
-            <th class="table__tr_border-l text-start w-[80px]">№</th>
-            <th class="table__tr text-start">ЗАГАЛОВОК</th>
+            <th class="table__tr_border-l text-start w-[100px]">№</th>
+            <th class="table__tr text-start">НАЗВАНИЕ</th>
+            <th class="table__tr text-center">ДАТА НАЧАЛА</th>
+            <th class="table__tr text-center">ДАТА ОКОНЧАНИЯ</th>
             <th class="table__tr_border-r text-end pr-[40px]">ДЕЙСТВИЯ</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in promotions" :key="index" class="tbody_tr">
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
-              #{{ index }}
+              #{{ ++index }}
             </td>
 
-            <!-- Name -->
+            <!-- Image -->
             <td class="tbody__td">
-              <span class="font-semibold text-[18px]">Летняя распродажа</span>
+              <div class="flex items-center space-x-[15px]">
+                <img
+                  class="img-box w-[40px] h-[40px] rounded-lg"
+                  :src="item.sm_banner"
+                  alt=""
+                />
+                <span class="font-semibold">{{ item.name.ru }}</span>
+              </div>
+            </td>
+
+            <td class="tbody__td text-center">
+              <span class="font-semibold text-blue">{{ item.start_date }}</span>
+            </td>
+
+            <td class="tbody__td text-center">
+              <span class="font-semibold text-blue">{{ item.end_date }}</span>
             </td>
 
             <!-- Actions -->
@@ -69,14 +88,33 @@
 <script>
 export default {
   data() {
-    return {}
+    return {
+      loading: false,
+      promotions: null,
+    }
   },
   head() {
     return {
       title: 'Акции',
     }
   },
+  mounted() {
+    this.fetchPromotions()
+  },
   methods: {
+    async fetchPromotions() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/promotions')
+        this.promotions = response.data.promotions.data
+        console.log(response.data.promotions.data)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     removeProduct() {},

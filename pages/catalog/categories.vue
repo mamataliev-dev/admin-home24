@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Категории</h1>
@@ -35,31 +37,33 @@
         <thead class="table__thead">
           <tr>
             <th class="table__tr_border-l text-start">КАТЕГОРИИ</th>
-            <th class="table__tr">ИКОНКА</th>
-            <th class="table__tr">ПОПУЛЯРНЫЙ</th>
-            <th class="table__tr">СТАТУС</th>
-            <th class="table__tr_border-r">ДЕЙСТВИЯ</th>
+            <th class="table__tr text-center">ИКОНКА</th>
+            <th class="table__tr text-center">ПОПУЛЯРНЫЙ</th>
+            <th class="table__tr text-center">СТАТУС</th>
+            <th class="table__tr_border-r text-center">ДЕЙСТВИЯ</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in categories" :key="index" class="tbody_tr">
             <!-- Category -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
               <div class="flex items-center space-x-[15px]">
                 <img
-                  class="border border-[rgb(235,238,244)] w-[50px] h-[50px] rounded-lg object-cover"
+                  class="img-box w-[50px] h-[50px] rounded-lg object-cover"
                   src="@/assets/img/png/test-product.png"
                   alt=""
                 />
 
                 <div class="flex space-x-[5px]">
-                  <span class="text-white text-[15px] font-semibold"
-                    >Мебель</span
+                  <span class="text-white text-[15px] font-semibold">{{
+                    item.name.ru
+                  }}</span>
+                  <span class="font-semibold text-[#4880FF]"
+                    >({{ item.children.length }})</span
                   >
-                  <span class="font-semibold text-[#4880FF]">(5)</span>
                 </div>
               </div>
             </td>
@@ -73,16 +77,24 @@
               />
             </td>
 
-            <!-- Price -->
-            <td class="tbody__td tbody__td_center">
-              <span class="font-semibold">360$</span>
+            <!-- Popular -->
+            <td
+              class="tbody__td tbody__td_center flex justify-center items-center max-auto mt-[15px]"
+            >
+              <div
+                :class="item.is_popular === 1 ? 'bg-blue' : 'bg-gray'"
+                class="w-[20px] h-[20px] rounded-lg"
+              ></div>
             </td>
 
             <!-- Status -->
             <td class="tbody__td tbody__td_center">
-              <span class="bg-[#00B69B] rounded-lg px-[16px] py-[8px]"
-                >Активный</span
+              <span
+                :class="item.is_active === 1 ? 'bg-[#00B69B]' : 'bg-[#EF3826]'"
+                class="rounded-lg px-[16px] py-[8px]"
               >
+                {{ item.is_active === 1 ? 'Активный' : 'Неактивный' }}
+              </span>
             </td>
 
             <!-- Actions -->
@@ -120,6 +132,7 @@
 export default {
   data() {
     return {
+      loading: false,
       query: '',
       stocks: [
         {
@@ -154,7 +167,26 @@ export default {
       title: 'Категории',
     }
   },
+  computed: {
+    categories() {
+      return this.$store.state.categories?.categories.data
+    },
+  },
+  mounted() {
+    this.fetchCategories()
+  },
   methods: {
+    async fetchCategories() {
+      this.loading = true
+      try {
+        await this.$store.dispatch('fetchCategories')
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     removeProduct() {},

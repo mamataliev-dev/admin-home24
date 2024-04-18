@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Группа Характеристики</h1>
@@ -47,7 +49,11 @@
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr
+            v-for="(item, index) in characteristics"
+            :key="index"
+            class="tbody_tr"
+          >
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
@@ -57,9 +63,9 @@
 
             <!-- Name -->
             <td class="tbody__td">
-              <span class="font-semibold text-[18px]"
-                >Общие характеристики</span
-              >
+              <span class="font-semibold text-[18px]">{{
+                item.group.name.ru
+              }}</span>
             </td>
 
             <!-- Actions -->
@@ -97,7 +103,9 @@
 export default {
   data() {
     return {
+      loading: false,
       query: '',
+      characteristics: null,
     }
   },
   head() {
@@ -105,7 +113,22 @@ export default {
       title: 'Группа Характеристики',
     }
   },
+  mounted() {
+    this.fetchCharacteristics()
+  },
   methods: {
+    async fetchCharacteristics() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/characteristics/all')
+        this.characteristics = response.data.characteristics
+        console.log(response.data.characteristics)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
     editProduct() {},
 
     removeProduct() {},

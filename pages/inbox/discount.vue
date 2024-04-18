@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LoadingModal :is-loading="loading" />
+
     <div class="header">
       <div class="header__block">
         <h1 class="header__title">Скидки</h1>
@@ -54,17 +56,17 @@
         </thead>
 
         <tbody>
-          <tr v-for="(item, index) in 6" :key="index" class="tbody_tr">
+          <tr v-for="(item, index) in discounts" :key="index" class="tbody_tr">
             <!-- Index -->
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
-              #{{ index }}
+              #{{ ++index }}
             </td>
 
             <!-- Name -->
             <td class="tbody__td">
-              <span class="font-semibold text-[18px]">Летняя распродажа</span>
+              <span class="font-semibold text-[18px]">{{ item.title.ru }}</span>
             </td>
 
             <!-- Actions -->
@@ -102,6 +104,8 @@
 export default {
   data() {
     return {
+      loading: false,
+      discounts: null,
       query: '',
       status: [
         {
@@ -121,7 +125,23 @@ export default {
       title: 'Скидки',
     }
   },
+  mounted() {
+    this.fetchDiscounts()
+  },
   methods: {
+    async fetchDiscounts() {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get('/discounts')
+        this.discounts = response.data.discounts.data
+        console.log(response.data.discounts.data)
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     removeProduct() {},
