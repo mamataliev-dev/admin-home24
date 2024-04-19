@@ -106,7 +106,6 @@ export default {
     this.fetchClients()
   },
   methods: {
-    //
     async fetchClients() {
       this.loading = true
       try {
@@ -119,7 +118,24 @@ export default {
         this.loading = false
       }
     },
-    removeProduct() {},
+
+    async removePromotions(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/promotions/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Акция успешно удалена',
+            type: 'success',
+          })
+
+          this.fetchPromotions()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
 
     editProduct() {},
 

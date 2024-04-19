@@ -58,7 +58,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeFaq(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -90,10 +90,10 @@ export default {
     }
   },
   mounted() {
-    this.fetchBanners()
+    this.fetchFaqs()
   },
   methods: {
-    async fetchBanners() {
+    async fetchFaqs() {
       this.loading = true
       try {
         const response = await this.$axiosURL.get('/faqs')
@@ -108,7 +108,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeFaq(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/faqs/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Вопрос успешно удален',
+            type: 'success',
+          })
+
+          this.fetchFaqs()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
   },
 }
 </script>

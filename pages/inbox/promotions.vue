@@ -39,7 +39,7 @@
               <div class="flex items-center space-x-[15px]">
                 <img
                   class="img-box w-[40px] h-[40px] rounded-lg"
-                  :src="item.sm_banner"
+                  :src="item.sm_banner || require('@/assets/img/png/empty.png')"
                   alt=""
                 />
                 <span class="font-semibold">{{ item.name.ru }}</span>
@@ -67,7 +67,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removePromotions(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -107,7 +107,6 @@ export default {
       try {
         const response = await this.$axiosURL.get('/promotions')
         this.promotions = response.data.promotions.data
-        console.log(response.data.promotions.data)
       } catch (error) {
         throw Error
       } finally {
@@ -117,7 +116,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removePromotions(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/promotions/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Акция успешно удалена',
+            type: 'success',
+          })
+
+          this.fetchPromotions()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
   },
 }
 </script>

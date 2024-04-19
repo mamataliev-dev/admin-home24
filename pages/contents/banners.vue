@@ -68,7 +68,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeBanners(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -228,7 +228,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeBanners(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/banners/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Баннер успешно удален',
+            type: 'success',
+          })
+
+          this.fetchBanners()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
   },
 }
 </script>

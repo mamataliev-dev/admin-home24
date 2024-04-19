@@ -802,16 +802,6 @@ export default {
   color: white !important;
 }
 
-#brand-btn {
-  border: none !important;
-}
-
-#brand-btn span {
-  display: flex !important;
-  align-items: center !important;
-  column-gap: 7px !important;
-}
-
 .el-form {
   width: 100% !important;
 }

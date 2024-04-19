@@ -27,7 +27,7 @@
             </div>
           </form>
 
-          <button class="header__btn" @click="dialogVisible = true">
+          <button class="header__btn" @click="isBrandModal = true">
             <img src="@/assets/img/icons/add.svg" alt="" />
             <span>Добавить брэнд</span>
           </button>
@@ -51,7 +51,7 @@
             <td
               class="last:rounded-bl-2xl tbody__td table__tr_border-b text-textGray font-medium pl-[30px]"
             >
-              #{{ index }}
+              #{{ ++index }}
             </td>
 
             <!-- Brand -->
@@ -79,7 +79,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeBrand(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -96,39 +96,51 @@
     </div>
 
     <!-- Add Brand Modal -->
-    <div>
-      <el-dialog
-        title="Добавить брэнд"
-        :visible.sync="dialogVisible"
-        width="520px"
+    <el-dialog
+      title="Добавить брэнд"
+      :visible.sync="isBrandModal"
+      width="520px"
+    >
+      <el-form
+        ref="brandForm"
+        :model="brandForm"
+        status-icon
+        class="demo-ruleForm"
+        action="#"
       >
-        <!-- Brand Name -->
-        <el-form
-          :model="dynamicValidateForm"
-          ref="dynamicValidateForm"
-          class="demo-dynamic"
-        >
-          <el-form-item
-            label="Брэнд"
-            :rules="{
+        <el-form-item
+          label="Название *"
+          prop="title"
+          :rules="[
+            {
               required: true,
-              message: 'Пожалуйста введите название брэнда',
+              message: 'Пожалуйста заполните это поле',
               trigger: 'blur',
-            }"
-          >
-            <el-input v-model="brandName"></el-input>
-          </el-form-item>
-        </el-form>
+            },
+          ]"
+        >
+          <el-input
+            v-model="brandForm.title"
+            type="text"
+            autocomplete="off"
+            placeholder="Название продукта"
+          ></el-input>
+        </el-form-item>
 
-        <!-- Is Popular -->
-        <div class="flex space-x-[20px] mt-[40px]">
-          <el-switch v-model="isPopular"> </el-switch>
-          <span class="font-semibold text-white">Популярные бренды</span>
-        </div>
+        <el-form-item>
+          <el-switch v-model="brandForm.isPopular"></el-switch>
+        </el-form-item>
 
         <!-- Image -->
         <div class="mt-[30px]">
-          <el-upload list-type="picture-card" :auto-upload="false">
+          <el-upload
+            v-model="brandForm.image"
+            class="avatar-uploader"
+            list-type="picture-card"
+            :auto-upload="false"
+            action="https://e-shop.ndc.uz/api/admin/files/upload"
+            :on-change="handleFileChange"
+          >
             <div class="pt-[40px]">
               <i class="el-icon-upload"></i>
               <div class="el-upload__text leading-[17px]">
@@ -152,14 +164,6 @@
                   <i class="el-icon-zoom-in"></i>
                 </span>
                 <span
-                  v-if="!disabled"
-                  class="el-upload-list__item-delete"
-                  @click="handleDownload(file)"
-                >
-                  <i class="el-icon-download"></i>
-                </span>
-                <span
-                  v-if="!disabled"
                   class="el-upload-list__item-delete"
                   @click="handleRemove(file)"
                 >
@@ -174,11 +178,14 @@
         <div
           class="flex justify-end space-x-[15px] mt-[30px] pt-[15px] border-t border-[#e8e8e8]"
         >
-          <el-button type="danger" plain>Отмена</el-button>
+          <el-button type="danger" plain @click="isBrandModal = false"
+            >Отмена</el-button
+          >
 
-          <button
-            class="flex items-center space-x-[7px] py-[6px] px-[18px] rounded-lg bg-blue"
-            @click="submitForm('dynamicValidateForm')"
+          <el-button
+            id="brand-btn"
+            class="!flex !items-center !space-x-[7px] !py-[6px] !px-[18px] !rounded-lg !bg-blue"
+            @click="addNewBrand()"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -202,11 +209,12 @@
                 ></path>
               </g>
             </svg>
-            <span class="font-semibold text-white">Сохранить</span>
-          </button>
+
+            <span class="font-semibold text-white">Добавить</span>
+          </el-button>
         </div>
-      </el-dialog>
-    </div>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -215,22 +223,18 @@ export default {
   data() {
     return {
       loading: false,
+      isCorfirmModal: false,
       brands: null,
       dialogImageUrl: '',
       dialogVisible: false,
       disabled: false,
       query: '',
-      isPopular: false,
-      brandName: '',
-      dynamicValidateForm: {
-        domains: [
-          {
-            key: 1,
-            value: '',
-          },
-        ],
-        email: '',
+      brandForm: {
+        title: '',
+        image: null,
+        isPopular: false,
       },
+      isBrandModal: false,
     }
   },
   head() {
@@ -256,8 +260,6 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
-
     searchAttribute() {},
 
     submitForm(formName) {},
@@ -266,17 +268,81 @@ export default {
       console.log(file)
     },
 
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
+    async handleFileChange(file, fileList) {
+      this.loading = true
+      const actualFile = file.raw
+
+      if (!actualFile) {
+        console.error('No file to upload')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('file', actualFile)
+
+      try {
+        const response = await this.$axiosURL.post('/files/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        console.log('Upload successful:', response.data)
+        this.brandForm.image = response.data.path
+        console.log('1', this.brandForm.image)
+      } catch (error) {
+        console.error('Upload error:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async addNewBrand() {
+      if (this.brandForm.title !== '') {
+        try {
+          const response = await this.$axiosURL.post('/brands', {
+            name: this.brandForm.title,
+            logo: this.brandForm.image,
+            is_top: this.brandForm.isPopular,
+          })
+
+          if (response) {
+            this.isBrandModal = false
+
+            this.$notify({
+              title: 'Success',
+              message: 'Брэнд успешно добавлен',
+              type: 'success',
+            })
+          }
+
+          console.log(response)
+        } catch (error) {
+          throw Error
+        }
+      }
+    },
+
+    async removeBrand(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/brands/${id}`)
+        console.log(response.data)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Брэнд успешно Удален',
+            type: 'success',
+          })
+
+          this.fetchBrands()
+        }
+      } catch (error) {
+        throw Error
+      }
     },
 
     handleDownload(file) {
       console.log(file)
-    },
-
-    resetForm(formName) {
-      this.$refs[formName].resetFields()
     },
   },
 }

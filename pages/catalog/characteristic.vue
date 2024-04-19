@@ -81,7 +81,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeCharacteristics(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -131,7 +131,23 @@ export default {
     },
     editProduct() {},
 
-    removeProduct() {},
+    async removeCharacteristics(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/characteristics/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Характиристика успешно удалена',
+            type: 'success',
+          })
+
+          this.fetchCharacteristics()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
 
     searchAttribute() {},
   },

@@ -188,7 +188,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeBlog(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/posts/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Блог успешно удален',
+            type: 'success',
+          })
+
+          this.fetchBlogs()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
   },
 }
 </script>

@@ -200,7 +200,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeAttribute(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -251,7 +251,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeAttribute(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/attributes/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Атрибут успешно удален',
+            type: 'success',
+          })
+
+          this.fetchAttributes()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
 
     searchAttribute() {},
   },

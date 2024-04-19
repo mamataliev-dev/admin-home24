@@ -4,11 +4,12 @@
 
     <div class="header">
       <div class="header__block">
-        <h1 class="header__title">{{ title }}</h1>
+        <h1 class="header__title">{{ checkRoute().title }}</h1>
       </div>
 
       <div class="grid xl:grid-cols-5 2xl:grid-cols-7 gap-x-5 gap-y-5">
         <nuxt-link
+          :class="checkRoute().activeOrder"
           class="flex space-x-[7px] py-[10px] px-[18px] transition-all duration-200 rounded-lg hover:bg-[#727E93]"
           to="/orders/new-orders"
         >
@@ -74,6 +75,7 @@
       </div>
 
       <form
+        v-if="checkRoute().activeOrder !== 'all'"
         class="relative flex space-x-[20px]"
         @submit.prevent="searchProduct"
       >
@@ -94,7 +96,7 @@
       </form>
 
       <form
-        v-if="false"
+        v-if="checkRoute().activeOrder === 'all'"
         class="relative flex justify-between"
         @submit.prevent="searchProduct"
       >
@@ -190,7 +192,7 @@
 
             <!-- Phone Number -->
             <td class="tbody__td tbody__td_center">
-              <span class="font-semibold">{{ item.user.login }}</span>
+              <span class="font-semibold">+{{ item.user.login }}</span>
             </td>
 
             <!-- Date -->
@@ -220,12 +222,10 @@
             <!-- Status -->
             <td class="tbody__td tbody__td_center">
               <span
-                :class="
-                  item.status === 'active' ? 'bg-[#00B69B]' : 'bg-[#EF3826]'
-                "
-                class="rounded-lg px-[16px] py-[8px]"
+                :class="getOrderStatus(item.status).class"
+                class="rounded-lg px-[16px] py-[8px] font-bold"
               >
-                {{ item.status === 'active' ? 'Активный' : 'Неактивный' }}
+                {{ getOrderStatus(item.status).text }}
               </span>
             </td>
           </tr>
@@ -246,6 +246,7 @@ export default {
     return {
       loading: false,
       title: '',
+      activeOrder: '',
       status: '',
       query: '',
       ordersAmount: {
@@ -328,11 +329,13 @@ export default {
       ],
       region: '',
       date: '',
+      statusText: '',
+      statusClass: '',
     }
   },
   head() {
     return {
-      title: 'Возврат',
+      title: this.checkRoute().title,
     }
   },
   computed: {
@@ -345,7 +348,7 @@ export default {
   },
   watch: {
     $router() {
-      this.checkRuteTitle()
+      this.checkRoute()
     },
   },
   mounted() {
@@ -356,7 +359,7 @@ export default {
       await this.$store.dispatch('fetchOrders')
       await this.$store.dispatch('fetchOrdersCounts')
       await this.fetchStatusOrder()
-      this.checkRuteTitle()
+      this.checkRoute()
     },
 
     async fetchStatusOrder() {
@@ -373,33 +376,45 @@ export default {
       }
     },
 
-    checkRuteTitle() {
+    getOrderStatus(status) {
+      switch (status) {
+        case 'pending':
+          return { text: 'Ожидание', class: 'tag_pending' }
+        case 'accepted':
+          return { text: 'Принятые', class: 'tag_accepted' }
+        case 'returned':
+          return { text: 'Возврат', class: 'tag_returned' }
+        case 'canceled':
+          return { text: 'Отмененнен', class: 'tag_canceled' }
+        case 'on_the_way':
+          return { text: 'В дороге', class: 'tag_delivery' }
+        case 'done':
+          return { text: 'Доставленные', class: 'tag_delivered' }
+        case 'new':
+          return { text: 'Новые', class: 'tag_new' }
+        default:
+          return { text: '', class: '' }
+      }
+    },
+
+    checkRoute() {
       switch (this.$route.params.id) {
         case 'all-orders':
-          this.title = 'Все заказы'
-          break
+          return { title: 'Все заказы', activeOrder: 'all' }
         case 'pending-orders':
-          this.title = 'Ожидания'
-          break
+          return { title: 'Ожидания', activeOrder: 'pending' }
         case 'accepted-orders':
-          this.title = 'Принятые'
-          break
+          return { title: 'Принятые', activeOrder: 'accepted' }
         case 'new-orders':
-          this.title = 'Новые'
-          break
+          return { title: 'Новые', activeOrder: 'new' }
         case 'delivery-orders':
-          this.title = 'В доствке'
-          break
+          return { title: 'В доставке', activeOrder: 'delivery' }
         case 'delivered-orders':
-          this.title = 'Доставленные'
-          break
-        case 'refund-orders':
-          this.title = 'Возврат'
-          break
+          return { title: 'Доставленные', activeOrder: 'delivered' }
+        case 'returned-orders':
+          return { title: 'Возврат', activeOrder: 'refund' }
         case 'canceled-orders':
-          this.title = 'Отмененные'
-          break
-
+          return { title: 'Отмененные', activeOrder: 'canceled' }
         default:
           break
       }
@@ -426,6 +441,41 @@ export default {
 </script>
 
 <style>
+.tag_pending {
+  background: #fff4de;
+  color: #ffa909;
+}
+
+.tag_new {
+  background: #98d3d8;
+  color: #18b3bd;
+}
+
+.tag_delivery {
+  background: #b0b3b8;
+  color: #4b5668;
+}
+
+.tag_accesed {
+  background: #9bbfe3;
+  color: #3699ff;
+}
+
+.tag_returned {
+  background: #d69bce;
+  color: #e418c9;
+}
+
+.tag_delivered {
+  background: #7ed6ac;
+  color: #0b5f37;
+}
+
+.tag_canceled {
+  background: #e27777;
+  color: #e02323;
+}
+
 .el-range-input {
   background-color: #323d4e !important;
   color: #b5b5c3 !important;

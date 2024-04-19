@@ -159,7 +159,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeProduct(item?.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -319,7 +319,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeProduct(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/products/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Продукт успешно удален',
+            type: 'success',
+          })
+
+          this.fetchProducts()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
 
     searchProduct() {},
 

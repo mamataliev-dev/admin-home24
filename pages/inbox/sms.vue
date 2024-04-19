@@ -17,9 +17,9 @@
             <th class="table__tr_border-l text-start w-[80px]">№</th>
             <th class="table__tr text-start">ПОЛЬЗОВАТЕЛЬ</th>
             <th class="table__tr text-start">СООБЩЕНИЯ</th>
-            <th class="table__tr texr-center">ДАТА ОТПРАВЛЕНИЯ</th>
-            <th class="table__tr texr-center">УСПЕШНО ОТПРАВЛЕННЫЕ</th>
-            <th class="table__tr texr-center">НЕ ОТПРАВЛЕННЫЕ</th>
+            <th class="table__tr text-center">ДАТА ОТПРАВЛЕНИЯ</th>
+            <th class="table__tr text-center">УСПЕШНО ОТПРАВЛЕННЫЕ</th>
+            <th class="table__tr text-center">НЕ ОТПРАВЛЕННЫЕ</th>
             <th class="table__tr_border-r text-end pr-[40px]">ДЕЙСТВИЯ</th>
           </tr>
         </thead>

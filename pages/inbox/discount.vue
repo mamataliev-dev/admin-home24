@@ -82,7 +82,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeDiscount(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -144,7 +144,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeDiscount(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/discounts/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Скидка успешно удалена',
+            type: 'success',
+          })
+
+          this.fetchDiscounts()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
 
     searchProduct() {},
   },

@@ -110,7 +110,7 @@
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeProduct">
+                  <button @click="removeCategory(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
@@ -190,7 +190,23 @@ export default {
 
     editProduct() {},
 
-    removeProduct() {},
+    async removeCategory(id) {
+      try {
+        const response = await this.$axiosURL.delete(`/categories/${id}`)
+
+        if (response) {
+          this.$notify({
+            title: 'Success',
+            message: 'Категория успешно удалена',
+            type: 'success',
+          })
+
+          this.fetchCategories()
+        }
+      } catch (error) {
+        throw Error
+      }
+    },
 
     searchCategory() {},
   },

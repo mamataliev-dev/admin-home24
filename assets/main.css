@@ -297,3 +297,13 @@ table tr:last-child td:last-child {
   top: 85px !important;
   z-index: 999999 !important;
 }
+
+#brand-btn {
+  border: none !important;
+}
+
+#brand-btn span {
+  display: flex !important;
+  align-items: center !important;
+  column-gap: 7px !important;
+}
