@@ -18,7 +18,9 @@
         <!-- Orders sum by today -->
         <div class="item__block">
           <span class="item__text">Сумма заказов на сегодня</span>
-          <span class="item__number">{{ dashboard?.today_orders_count }}</span>
+          <span class="item__number !text-[#00b2a9]"
+            >{{ dashboard?.today_orders_count }} сум</span
+          >
         </div>
 
         <!-- New user by today -->
@@ -36,7 +38,9 @@
         <!-- Orders sum by all time -->
         <div class="item__block_under">
           <span class="item__text_under">Сумма заказов на вес период</span>
-          <span class="item__number_under">{{ dashboard?.orders_amount }}</span>
+          <span class="item__number_under"
+            >{{ dashboard?.orders_amount }} сум</span
+          >
         </div>
 
         <!-- Sum users -->

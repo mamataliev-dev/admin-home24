@@ -404,7 +404,11 @@
           </el-form-item>
 
           <el-form-item label="Выберите категорию" prop="category">
-            <el-select v-model="addCategoryForm.atrtibute" placeholder="Select">
+            <el-select
+              v-model="addCategoryForm.atrtibute"
+              placeholder="Select"
+              class="w-full"
+            >
               <el-option
                 v-for="item in categories"
                 :key="item.value"
@@ -415,12 +419,12 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="Информация о категории" prop="description">
+          <el-form-item label="Описание категории" prop="description">
             <el-input
               v-model="addCategoryForm.description"
               type="textarea"
               autocomplete="off"
-              :autosize="{ minRows: 2, maxRows: 4 }"
+              rows="5"
               placeholder="Описание..."
             ></el-input>
           </el-form-item>
@@ -435,9 +439,9 @@
             </el-form-item>
           </div>
 
-          <!-- <el-form-item
+          <el-form-item
             label="Атрибуты"
-            prop="status"
+            prop="attribute"
             :rules="[
               {
                 required: true,
@@ -450,6 +454,7 @@
               v-model="addCategoryForm.atrtibute"
               multiple
               placeholder="Select"
+              class="w-full"
             >
               <el-option
                 v-for="item in attributes"
@@ -461,7 +466,7 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item
+          <!-- <el-form-item
             label="Характеристическая группа"
             prop="status"
             :rules="[
@@ -652,7 +657,7 @@ export default {
       return this.recursive(this.$store.state.categories?.categories.data)
     },
     attributes() {
-      return this.$store.state.attributes?.attributes
+      return this.$store.state.attributes
     },
     characteristics() {
       return this.$store.state.characteristics?.characteristics
@@ -667,12 +672,17 @@ export default {
     // },
   },
   mounted() {
-    this.$store.dispatch('fetchBrands')
-    this.$store.dispatch('fetchCategories')
-    this.$store.dispatch('fetchAttributes')
-    this.$store.dispatch('fetchCharacteristics')
+    this.asyncFunctions()
+    console.log(this.attributes)
   },
   methods: {
+    async asyncFunctions() {
+      await this.$store.dispatch('fetchAttributes')
+      await this.$store.dispatch('fetchBrands')
+      await this.$store.dispatch('fetchCategories')
+      this.$store.dispatch('fetchCharacteristics')
+    },
+
     recursive(data) {
       return data?.map((el) => {
         return {

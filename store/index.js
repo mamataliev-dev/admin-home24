@@ -38,7 +38,8 @@ export const actions = {
   async fetchBrands({ commit }) {
     try {
       const response = await this.$axiosURL.get('/brands/all')
-      commit('setBrands', response.data)
+      commit('setBrands', response.data.brands)
+      console.log('store brands: ', response.data.brands)
     } catch (error) {
       throw Error
     }
@@ -58,7 +59,7 @@ export const actions = {
   async fetchAttributes({ commit }) {
     try {
       const response = await this.$axiosURL.get('/attributes/all')
-      commit('setAttributes', response.data)
+      commit('setAttributes', response.data.attributes)
     } catch (error) {
       throw Error
     }
