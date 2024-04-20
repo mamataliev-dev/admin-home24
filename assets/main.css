@@ -307,3 +307,38 @@ table tr:last-child td:last-child {
   align-items: center !important;
   column-gap: 7px !important;
 }
+
+.tag_pending {
+  background: #fff4de;
+  color: #ffa909;
+}
+
+.tag_new {
+  background: #98d3d8;
+  color: #18b3bd;
+}
+
+.tag_delivery {
+  background: #b0b3b8;
+  color: #4b5668;
+}
+
+.tag_accesed {
+  background: #9bbfe3;
+  color: #3699ff;
+}
+
+.tag_returned {
+  background: #d69bce;
+  color: #e418c9;
+}
+
+.tag_delivered {
+  background: #7ed6ac;
+  color: #0b5f37;
+}
+
+.tag_canceled {
+  background: #e27777;
+  color: #e02323;
+}

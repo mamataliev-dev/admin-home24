@@ -309,7 +309,7 @@
           <nuxt-link
             :class="openList === 'clients' ? 'active' : ''"
             class="dashboard-link"
-            to="/clients"
+            to="/home/clients"
           >
             <span :class="{ 'text-white': openList === 'clients' }"
               >Клиенты</span

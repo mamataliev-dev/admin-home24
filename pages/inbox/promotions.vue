@@ -78,7 +78,14 @@
       </table>
 
       <div class="flex justify-end mt-[30px]">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="pagination.total"
+          :current-page.sync="pagination.current_page"
+          :page-size="pagination.per_page"
+          @current-change="handlePageChange"
+        >
         </el-pagination>
       </div>
     </div>
@@ -91,6 +98,11 @@ export default {
     return {
       loading: false,
       promotions: null,
+      pagination: {
+        total: 0,
+        per_page: 0,
+        current_page: 0,
+      },
     }
   },
   head() {
@@ -107,6 +119,13 @@ export default {
       try {
         const response = await this.$axiosURL.get('/promotions')
         this.promotions = response.data.promotions.data
+        console.log(response.data.promotions.data)
+
+        this.pagination = {
+          total: response.data.promotions.total,
+          per_page: response.data.promotions.per_page,
+          current_page: response.data.promotions.current_page,
+        }
       } catch (error) {
         throw Error
       } finally {

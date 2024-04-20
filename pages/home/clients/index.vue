@@ -45,7 +45,7 @@
             </td>
 
             <!-- Registration Date -->
-            <td class="tbody__td text-center">
+            <td class="tbody__td flex items-center justify-center">
               <span class="font-medium text-blue text-[16px]">{{
                 formatDate(item.created_at)
               }}</span>
@@ -59,20 +59,13 @@
             </td>
 
             <!-- Actions -->
-            <td class="tbody__td pr-[30px]">
-              <div class="flex justify-end">
+            <td class="tbody__td">
+              <div class="flex justify-end pr-[30px]">
                 <div
-                  class="flex items-center justify-between bg-[#323D4E] py-[8px] px-[16px] rounded-lg w-[100px]"
+                  class="flex items-center justify-between bg-[#323D4E] py-[8px] px-[16px] rounded-lg"
                 >
-                  <button
-                    class="border-r border-[#979797] pr-[16px]"
-                    @click="editProduct"
-                  >
+                  <button @click="$router.push(`/home/clients/${item.id}`)">
                     <img src="@/assets/img/icons/edit.svg" alt="" />
-                  </button>
-
-                  <button @click="removeProduct">
-                    <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
               </div>
@@ -82,7 +75,14 @@
       </table>
 
       <div class="flex justify-end mt-[30px]">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="pagination.total"
+          :current-page.sync="pagination.current_page"
+          :page-size="pagination.per_page"
+          @current-change="handlePageChange"
+        >
         </el-pagination>
       </div>
     </div>
@@ -95,6 +95,11 @@ export default {
     return {
       loading: false,
       clients: null,
+      pagination: {
+        total: 0,
+        per_page: 1,
+        current_page: 16,
+      },
     }
   },
   head() {
@@ -109,9 +114,19 @@ export default {
     async fetchClients() {
       this.loading = true
       try {
-        const response = await this.$axiosURL.get('/clients')
+        const page = this.$route.query.page
+        const perPage = this.$route.query.perPage
+
+        const response = await this.$axiosURL.get(
+          `/clients?page=${page}&per_page=${perPage}`
+        )
         this.clients = response.data.clients.data
-        console.log(response.data.clients.data)
+
+        this.pagination = {
+          total: response.data.clients.total,
+          per_page: response.data.clients.per_page,
+          current_page: response.data.clients.current_page,
+        }
       } catch (error) {
         throw Error
       } finally {
@@ -119,25 +134,32 @@ export default {
       }
     },
 
-    async removePromotions(id) {
+    async handlePageChange(page) {
+      this.$router.push({
+        query: {
+          page: this.pagination.current_page,
+          per_page: this.pagination.per_page,
+        },
+      })
+
+      this.loading = true
       try {
-        const response = await this.$axiosURL.delete(`/promotions/${id}`)
+        const response = await this.$axiosURL.get(
+          `/clients?page=${this.pagination.current_page}&per_page=${this.pagination.per_page}`
+        )
+        this.clients = response.data.clients.data
 
-        if (response) {
-          this.$notify({
-            title: 'Success',
-            message: 'Акция успешно удалена',
-            type: 'success',
-          })
-
-          this.fetchPromotions()
+        this.pagination = {
+          total: response.data.clients.total,
+          per_page: response.data.clients.per_page,
+          current_page: response.data.clients.current_page,
         }
       } catch (error) {
         throw Error
+      } finally {
+        this.loading = false
       }
     },
-
-    editProduct() {},
 
     formatDate(dateStr) {
       const date = new Date(dateStr)
@@ -146,5 +168,3 @@ export default {
   },
 }
 </script>
-
-<style></style>

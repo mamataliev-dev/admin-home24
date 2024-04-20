@@ -12,10 +12,7 @@
         </button>
       </div>
 
-      <form
-        class="relative flex justify-between"
-        @submit.prevent="searchProduct"
-      >
+      <form class="relative flex justify-between" @submit.prevent>
         <div>
           <input
             v-model="query"
@@ -31,16 +28,20 @@
           />
         </div>
 
-        <div>
-          <el-select v-model="value2" placeholder="Активные">
+        <div class="flex space-x-[15px]">
+          <el-select v-model="status" placeholder="Активные">
             <el-option
-              v-for="item in status"
+              v-for="item in statuses"
               :key="item.value"
               :label="item.label"
               :value="item.value"
             >
             </el-option>
           </el-select>
+
+          <el-button type="primary" :disabled="!isFilter" @click="removeFilter">
+            <i class="el-icon-refresh-right !text-[20px]"></i>
+          </el-button>
         </div>
       </form>
     </div>
@@ -77,17 +78,21 @@
                 >
                   <button
                     class="border-r border-[#979797] pr-[16px]"
-                    @click="dialogVisible = true"
+                    @click="$router.push('/add-discount')"
                   >
                     <img src="@/assets/img/icons/edit.svg" alt="" />
                   </button>
 
-                  <button @click="removeDiscount(item.id)">
+                  <button @click="editDiscount(item.id)">
                     <img src="@/assets/img/icons/trash.svg" alt="" />
                   </button>
                 </div>
               </div>
             </td>
+          </tr>
+
+          <tr v-if="discounts?.length === 0" class="relative h-[250px]">
+            <EmptyData />
           </tr>
         </tbody>
       </table>
@@ -106,18 +111,19 @@ export default {
     return {
       loading: false,
       discounts: null,
+      isFilter: false,
       query: '',
-      status: [
+      status: '',
+      statuses: [
         {
-          value: 'active',
+          value: 1,
           label: 'Активные',
         },
         {
-          value: 'archive',
+          value: 0,
           label: 'Архив',
         },
       ],
-      value2: '',
     }
   },
   head() {
@@ -125,8 +131,21 @@ export default {
       title: 'Скидки',
     }
   },
+  watch: {
+    status(newVal) {
+      this.isFilter = true
+      this.fetchStatusDiscount(newVal)
+    },
+  },
   mounted() {
     this.fetchDiscounts()
+
+    this.$router.push({
+      query: {
+        page: 1,
+        per_page: 16,
+      },
+    })
   },
   methods: {
     async fetchDiscounts() {
@@ -142,7 +161,42 @@ export default {
       }
     },
 
-    editProduct() {},
+    async fetchStatusDiscount(status) {
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get(`/discounts?status=${status}`)
+        this.discounts = response.data.discounts.data
+        console.log(response.data.discounts.data)
+
+        this.$router.push({
+          query: {
+            page: 1,
+            per_page: 16,
+            status,
+          },
+        })
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    removeFilter() {
+      this.isFilter = false
+      this.fetchDiscounts()
+
+      this.$router.push({
+        query: {
+          page: 1,
+          per_page: 16,
+        },
+      })
+    },
+
+    editDiscount(id) {
+      console.log(id)
+    },
 
     async removeDiscount(id) {
       try {
@@ -161,8 +215,6 @@ export default {
         throw Error
       }
     },
-
-    searchProduct() {},
   },
 }
 </script>
