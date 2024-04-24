@@ -91,3 +91,41 @@ export default {
   },
 }
 </script>
+
+<style>
+.ql-snow .ql-stroke {
+  stroke: white !important;
+}
+
+.ql-snow .ql-fill {
+  stroke: white !important;
+}
+
+.ql-snow .ql-picker {
+  color: white !important;
+}
+
+.ql-container.ql-snow {
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.ql-toolbar.ql-snow {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+  border: 0.1px solid white !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: #c0c4cc !important;
+}
+
+.ql-container {
+  height: 200px !important;
+  border: 0.1px solid white !important;
+}
+
+.ql-picker-item {
+  color: #1b2431 !important;
+}
+</style>

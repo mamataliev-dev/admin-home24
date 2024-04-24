@@ -92,7 +92,13 @@
       </table>
 
       <div class="flex justify-end mt-[30px]">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="1"
+          :page-size="1"
+          @current-change="handlePageChange"
+        >
         </el-pagination>
       </div>
     </div>
@@ -106,6 +112,11 @@ export default {
       loading: false,
       query: '',
       characteristics: null,
+      pagination: {
+        total: 0,
+        per_page: 1,
+        current_page: 16,
+      },
     }
   },
   head() {
@@ -122,13 +133,46 @@ export default {
       try {
         const response = await this.$axiosURL.get('/characteristics/all')
         this.characteristics = response.data.characteristics
-        console.log(response.data.characteristics)
+
+        this.pagination = {
+          total: response.data.characteristics.total,
+          per_page: response.data.characteristics.per_page,
+          current_page: response.data.characteristics.current_page,
+        }
       } catch (error) {
         throw Error
       } finally {
         this.loading = false
       }
     },
+
+    async handlePageChange() {
+      this.$router.push({
+        query: {
+          page: this.pagination.current_page,
+          per_page: this.pagination.per_page,
+        },
+      })
+
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get(
+          `/characteristics/all?page=${this.pagination.current_page}&per_page=${this.pagination.per_page}`
+        )
+        this.clients = response.data.characteristics
+
+        this.pagination = {
+          total: response.data.characteristics.total,
+          per_page: response.data.characteristics.per_page,
+          current_page: response.data.characteristics.current_page,
+        }
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
     editProduct() {},
 
     async removeCharacteristics(id) {

@@ -109,6 +109,13 @@ export default {
   },
   mounted() {
     this.fetchClients()
+
+    this.$router.push({
+      query: {
+        page: this.$route.query.page || 1,
+        per_page: this.$route.query.per_page || 16,
+      },
+    })
   },
   methods: {
     async fetchClients() {
@@ -134,7 +141,7 @@ export default {
       }
     },
 
-    async handlePageChange(page) {
+    async handlePageChange() {
       this.$router.push({
         query: {
           page: this.pagination.current_page,

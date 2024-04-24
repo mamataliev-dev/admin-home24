@@ -58,7 +58,7 @@
 
       <div>
         <div class="cart__block_lang !rounded-lg">
-          <h1 class="cart__block-title mb-[15px]">Адреса</h1>
+          <h1 class="cart__block-title mb-[15px]">Адрес</h1>
 
           <hr />
 
@@ -106,9 +106,9 @@
 
               <!-- Phone number -->
               <td class="tbody__td text-center">
-                <span class="font-medium text-[#A1A5BF] text-[16px]">{{
-                  item.phone_number
-                }}</span>
+                <span class="font-medium text-[#A1A5BF] text-[16px]"
+                  >+{{ item.phone_number }}</span
+                >
               </td>
 
               <!-- Status -->
@@ -167,9 +167,7 @@ export default {
         const response = await this.$axiosURL.get(
           `/clients/${this.$route.params.id}`
         )
-
         this.client = response.data.client
-        console.log(response.data.client)
       } catch (error) {
         console.log(error)
       } finally {

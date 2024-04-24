@@ -356,17 +356,17 @@ export default {
   },
   methods: {
     async asyncFunctions() {
-      await this.$store.dispatch('fetchOrders')
       await this.$store.dispatch('fetchOrdersCounts')
-      await this.fetchStatusOrder()
+      await this.fetchOrders()
       this.checkRoute()
     },
 
-    async fetchStatusOrder() {
+    async fetchOrders() {
       this.loading = true
 
       try {
-        const response = await this.$axiosURL(`/orders?status=${this.status}`)
+        const response = await this.$axiosURL(`/orders`)
+
         this.$store.commit('setOrders', response.data.orders.data)
         console.log(response.data.orders.data)
       } catch (error) {

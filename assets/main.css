@@ -342,3 +342,57 @@ table tr:last-child td:last-child {
   background: #e27777;
   color: #e02323;
 }
+
+#preview .el-dialog__header {
+  border: none !important;
+}
+
+.el-upload .el-upload--picture-card {
+  background: #d6d6d6 !important;
+}
+
+.demo-dynamic {
+  background: #323d4e !important;
+}
+
+.el-icon-upload::before {
+  content: url('@/assets/img/icons/upload-img.svg');
+}
+
+.el-upload-dragger {
+  width: 117px !important;
+  height: 117px !important;
+}
+
+.el-upload-dragger .el-icon-upload {
+  margin: 0 !important;
+}
+
+.el-upload__text {
+  font-size: 12px !important;
+  color: #3699ff !important;
+  text-align: center !important;
+  margin-top: 10px !important;
+}
+
+.el-upload--picture-card {
+  line-height: 0px !important;
+}
+
+.el-dialog {
+  background: #323d4e !important;
+  border-radius: 10px !important;
+}
+
+.el-form-item__label {
+  color: #979797 !important;
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid #e8e8e8 !important;
+  padding-bottom: 20px !important;
+}
+
+.el-dialog__title {
+  color: white !important;
+}

@@ -305,13 +305,13 @@
 
       <!-- Clients -->
       <li>
-        <button @click="toggleDropdown('clients')">
+        <button @click="toggleDropdown('home/clients')">
           <nuxt-link
-            :class="openList === 'clients' ? 'active' : ''"
+            :class="openList === 'home/clients' ? 'active' : ''"
             class="dashboard-link"
             to="/home/clients"
           >
-            <span :class="{ 'text-white': openList === 'clients' }"
+            <span :class="{ 'text-white': openList === 'home/clients' }"
               >Клиенты</span
             >
           </nuxt-link>

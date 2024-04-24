@@ -7,7 +7,7 @@
         <h1 class="header__title">Блог</h1>
 
         <div class="flex space-x-[30px]">
-          <button class="header__btn" @click="isBrandModal = true">
+          <button class="header__btn" @click="isModalOpen = true">
             <img src="@/assets/img/icons/add.svg" alt="" />
             <span>Добавить</span>
           </button>
@@ -77,24 +77,31 @@
               </div>
             </td>
           </tr>
+
+          <tr v-if="blogs?.length === 0" class="relative h-[250px]">
+            <EmptyData />
+          </tr>
         </tbody>
       </table>
 
       <div class="flex justify-end mt-[30px]">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="pagination.total"
+          :current-page.sync="pagination.current_page"
+          :page-size="pagination.per_page"
+          @current-change="handlePageChange"
+        >
         </el-pagination>
       </div>
     </div>
 
     <!-- Add Brand Modal -->
-    <!-- <el-dialog
-      title="Добавить брэнд"
-      :visible.sync="isBrandModal"
-      width="520px"
-    >
+    <el-dialog title="Добавить блог" :visible.sync="isModalOpen" width="520px">
       <el-form
         ref="brandForm"
-        :model="brandForm"
+        :model="blogForm"
         status-icon
         class="demo-ruleForm"
         action="#"
@@ -111,16 +118,20 @@
           ]"
         >
           <el-input
-            v-model="brandForm.title"
+            v-model="blogForm.ruTitle"
             type="text"
             autocomplete="off"
             placeholder="Название продукта"
           ></el-input>
+
+          <TextEditor @content="getContent" />
         </el-form-item>
 
+        <!-- :file-list="fileList" -->
+        <!-- Image -->
         <div class="mt-[30px]">
           <el-upload
-            v-model="brandForm.image"
+            v-model="blogForm.image"
             class="avatar-uploader"
             list-type="picture-card"
             :auto-upload="false"
@@ -160,17 +171,18 @@
           </el-upload>
         </div>
 
+        <!-- Cancel / Add -->
         <div
           class="flex justify-end space-x-[15px] mt-[30px] pt-[15px] border-t border-[#e8e8e8]"
         >
-          <el-button type="danger" plain @click="isBrandModal = false"
+          <el-button type="danger" plain @click="isModalOpen = false"
             >Отмена</el-button
           >
 
           <el-button
             id="brand-btn"
             class="!flex !items-center !space-x-[7px] !py-[6px] !px-[18px] !rounded-lg !bg-blue"
-            @click="addNewBrand()"
+            @click="addNewBlog()"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +211,7 @@
           </el-button>
         </div>
       </el-form>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -207,9 +219,24 @@
 export default {
   data() {
     return {
+      isRussian: true,
+      isModalOpen: false,
       loading: true,
       isPopular: null,
       blogs: null,
+      fileList: [],
+      pagination: {
+        total: 0,
+        per_page: 16,
+        current_page: 1,
+      },
+      ruDescription: '',
+      uzDescription: '',
+      blogForm: {
+        ruTitle: '',
+        uzTitle: '',
+        image: null,
+      },
     }
   },
   head() {
@@ -219,13 +246,58 @@ export default {
   },
   mounted() {
     this.fetchBlogs()
+
+    this.$router.push({
+      query: {
+        page: this.$route.query.page || 1,
+        per_page: this.$route.query.perPage || 16,
+      },
+    })
   },
   methods: {
     async fetchBlogs() {
       this.loading = true
       try {
-        const response = await this.$axiosURL.get('/posts')
+        const page = this.$route.query.page
+        const perPage = this.$route.query.perPage
+
+        const response = await this.$axiosURL.get(
+          `/posts?page=${page}&per_page=${perPage}`
+        )
         this.blogs = response.data.posts.data
+
+        this.pagination = {
+          total: response.data.posts.total,
+          per_page: response.data.posts.per_page,
+          current_page: response.data.posts.current_page,
+        }
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async handlePageChange() {
+      this.$router.push({
+        query: {
+          page: this.pagination.current_page,
+          per_page: this.pagination.per_page,
+        },
+      })
+
+      this.loading = true
+      try {
+        const response = await this.$axiosURL.get(
+          `/posts?page=${this.pagination.current_page}&per_page=${this.pagination.per_page}`
+        )
+        this.blogs = response.data.posts.data
+
+        this.pagination = {
+          total: response.data.posts.total,
+          per_page: response.data.posts.per_page,
+          current_page: response.data.posts.current_page,
+        }
       } catch (error) {
         throw Error
       } finally {
@@ -240,32 +312,6 @@ export default {
         month: '2-digit',
         year: 'numeric',
       })
-    },
-
-    async addNewBrand() {
-      if (this.brandForm.title !== '') {
-        try {
-          const response = await this.$axiosURL.post('/brands', {
-            name: this.brandForm.title,
-            logo: this.brandForm.image,
-            is_top: 0,
-          })
-
-          if (response) {
-            this.isBrandModal = false
-
-            this.$notify({
-              title: 'Success',
-              message: 'Брэнд успешно добавлен',
-              type: 'success',
-            })
-          }
-
-          console.log(response)
-        } catch (error) {
-          throw Error
-        }
-      }
     },
 
     async handleFileChange(file, fileList) {
@@ -286,9 +332,11 @@ export default {
             'Content-Type': 'multipart/form-data',
           },
         })
-        console.log('Upload successful:', response.data)
-        this.brandForm.image = response.data.path
-        console.log('1', this.brandForm.image)
+        this.blogForm.image = response.data.path
+
+        console.log('blogeg')
+        console.log(this.blogForm.image)
+        console.log('blogeg')
       } catch (error) {
         console.error('Upload error:', error)
       } finally {
@@ -297,10 +345,56 @@ export default {
     },
 
     handleRemove(file) {
-      console.log(file)
+      const index = this.fileList.indexOf(file)
+      if (index !== -1) {
+        this.fileList.splice(index, 1)
+      }
+      this.editBrandData.img = ''
     },
 
-    editProduct() {},
+    async addNewBlog() {
+      try {
+        const response = await this.$axiosURL.post('/posts', {
+          title: {
+            ru: this.blogForm.ruTitle,
+            uz: this.blogForm.uzTitle,
+            en: '',
+          },
+          desc: {
+            ru: this.ruDescription,
+            uz: this.uzDescription,
+            en: '',
+          },
+          img: this.blogForm.image,
+        })
+
+        console.log(response)
+
+        if (response) {
+          this.isModalOpen = false
+
+          this.$notify({
+            title: 'Success',
+            message: 'Блог успешно добавлен',
+            type: 'success',
+          })
+
+          this.fetchBlogs()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    editProduct(id, name, img) {
+      this.fileList = [
+        {
+          name: 'brand-image',
+          url: img,
+          status: 'finished',
+        },
+      ]
+    },
 
     async removeBlog(id) {
       try {
@@ -319,11 +413,10 @@ export default {
         throw Error
       }
     },
+
+    getContent(val) {
+      this.ruDescription = val
+    },
   },
 }
 </script>
-
-<style>
-.el-dialog__header {
-}
-</style>

@@ -18,10 +18,11 @@
       <form
         class="relative flex space-x-[20px]"
         @submit.prevent="searchProduct"
+        @keydown.enter="searchProduct"
       >
         <div>
           <input
-            v-model="query"
+            v-model="productQuery"
             type="text"
             placeholder="Поиск продукта"
             class="w-[290px] border-[0.1px] border-[rgba(207, 207, 207, 0.1142)] rounded-lg bg-[#323D4E] py-[12px] pl-[50px] pr-[16px] focus:outline-none"
@@ -36,7 +37,7 @@
 
         <div>
           <input
-            v-model="query"
+            v-model="categoryQuery"
             type="text"
             placeholder="Фильтр по категориям"
             class="w-[290px] border-[0.1px] border-[rgba(207, 207, 207, 0.1142)] rounded-lg bg-[#323D4E] py-[12px] px-[16px] focus:outline-none"
@@ -199,7 +200,8 @@ export default {
         per_page: 0,
         current_page: 0,
       },
-      query: '',
+      productQuery: '',
+      categoryQuery: '',
       stocks: [
         {
           value: 'in stock',
@@ -233,29 +235,35 @@ export default {
       title: 'Продукты',
     }
   },
-  watch: {
-    $route: {
-      handler: 'fetchProducts',
-      immediate: true,
-    },
-  },
   mounted() {
-    this.fetchProducts()
-
-    this.$router.push({
-      query: {
-        page: 1,
-        per_page: 16,
-      },
-    })
+    if (this.$route.query.search) {
+      this.productQuery = this.$route.query.search
+      this.fetchSearchProducts(this.productQuery)
+    } else {
+      this.fetchProducts()
+    }
   },
   methods: {
+    searchProduct() {
+      this.fetchSearchProducts(this.productQuery)
+    },
+
+    updateSearchQuery(query) {
+      this.$router.push({
+        query: {
+          page: this.$route.query.page,
+          per_page: this.$route.query.perPage,
+          search: query,
+        },
+      })
+    },
+
     async fetchProducts() {
       this.loading = true
 
       try {
-        const page = this.$route.query.page || 1
-        const perPage = this.$route.query.perPage || 16
+        const page = this.$route.query.page
+        const perPage = this.$route.query.perPage
 
         const response = await this.$axiosURL.get(
           `/products?page=${page}&per_page=${perPage}`
@@ -268,6 +276,40 @@ export default {
           per_page: response.data.products.per_page,
           current_page: response.data.products.current_page,
         }
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchSearchProducts(query) {
+      this.loading = true
+
+      try {
+        const page = this.$route.query.page
+        const perPage = this.$route.query.perPage
+
+        const response = await this.$axiosURL.get(
+          `/products?page=${page}&per_page=${perPage}&search=${query}`
+        )
+
+        this.products = response.data.products.data
+        console.log(response.data.products.data)
+
+        this.pagination = {
+          total: response.data.products.total,
+          per_page: response.data.products.per_page,
+          current_page: response.data.products.current_page,
+        }
+
+        // this.$router.push({
+        //   query: {
+        //     page: this.pagination.current_page,
+        //     per_page: this.pagination.per_page,
+        //     search: query,
+        //   },
+        // })
       } catch (error) {
         throw Error
       } finally {
@@ -336,8 +378,6 @@ export default {
         throw Error
       }
     },
-
-    searchProduct() {},
 
     arraySpanMethod({ row, column, rowIndex, columnIndex }) {
       if (rowIndex % 2 === 0) {

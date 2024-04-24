@@ -92,7 +92,13 @@
       </table>
 
       <div class="flex justify-end mt-[30px]">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="1"
+          :page-size="1"
+          @current-change="handlePageChange"
+        >
         </el-pagination>
       </div>
     </div>
@@ -340,6 +346,15 @@
         </div>
       </el-form>
     </el-dialog>
+
+    <!-- Image Privew Modal -->
+    <el-dialog id="preview" :visible.sync="isPreviewModal" width="40%">
+      <img
+        :src="previewImage"
+        alt="Preview"
+        style="width: 100%; height: auto"
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -348,10 +363,18 @@ export default {
   data() {
     return {
       loading: false,
+      brands: null,
       isEditBrandModal: false,
+      isPreviewModal: false,
       isCorfirmModal: false,
       dialogImageUrl: '',
       dialogVisible: false,
+      previewImage: '',
+      pagination: {
+        total: 0,
+        per_page: 16,
+        current_page: 1,
+      },
       fileList: [],
       editBrandData: {
         id: '',
@@ -375,42 +398,41 @@ export default {
       title: 'Брэнды',
     }
   },
-  computed: {
-    brands() {
-      return this.$store.state.brands
-    },
-  },
-  // watch: {
-  //   query(newVal) {
-  //     if (newVal.length >= 3) {
-  //       this.fetchSearchBrands(newVal)
-  //     }
-  //   },
-  // },
+  computed: {},
   mounted() {
-    this.$store.dispatch('fetchBrands')
-
-    this.$router.push({
-      query: {
-        page: 1,
-        per_page: 16,
-      },
-    })
+    this.fetchBrands()
   },
   methods: {
-    // async fetchSearchBrands(query) {
-    //   try {
-    //     const response = await this.$axiosURL.get(`/brands/all&search=${query}`)
+    async fetchBrands() {
+      this.loading = true
 
-    //     if (response) {
-    //       this.$store.commit('setBrands', response.data.brands)
-    //     } else {
-    //       this.$store.commit('setBrands', [])
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to fetch brands:', error)
-    //   }
-    // },
+      try {
+        const response = await this.$axiosURL.get('/brands/all')
+
+        this.brands = response.data.brands
+
+        console.log(response.data)
+
+        this.pagination = {
+          total: response.data.total,
+          per_page: response.data.per_page,
+          current_page: response.data.current_page,
+        }
+      } catch (error) {
+        throw Error
+      } finally {
+        this.loading = false
+      }
+    },
+
+    handlePageChange() {
+      this.$router.push({
+        query: {
+          page: this.pagination.current_page,
+          per_page: this.pagination.per_page,
+        },
+      })
+    },
 
     async updateBrand() {
       try {
@@ -463,10 +485,11 @@ export default {
       if (index !== -1) {
         this.fileList.splice(index, 1)
       }
+
       this.editBrandData.img = ''
     },
 
-    async handleFileChange(file, fileList) {
+    async handleFileChange(file) {
       this.loading = true
       const actualFile = file.raw
 
@@ -485,9 +508,7 @@ export default {
           },
         })
 
-        console.log('Upload successful:', response.data)
         this.brandForm.image = response.data.path
-        console.log('1', this.brandForm.image)
       } catch (error) {
         console.error('Upload error:', error)
       } finally {
@@ -513,7 +534,7 @@ export default {
               type: 'success',
             })
 
-            this.$store.dispatch('fetchBrands')
+            this.fetchBrands()
           }
         } catch (error) {
           throw Error
@@ -532,68 +553,17 @@ export default {
             type: 'success',
           })
 
-          this.$store.dispatch('fetchBrands')
+          this.fetchBrands()
         }
       } catch (error) {
         console.log(error)
       }
     },
 
-    handleDownload(file) {
-      console.log(file)
+    handlePictureCardPreview(file) {
+      this.previewImage = file.url
+      this.isPreviewModal = true
     },
   },
 }
 </script>
-
-<style>
-.el-upload .el-upload--picture-card {
-  background: #d6d6d6 !important;
-}
-
-.demo-dynamic {
-  background: #323d4e !important;
-}
-
-.el-icon-upload::before {
-  content: url('@/assets/img/icons/upload-img.svg');
-}
-
-.el-upload-dragger {
-  width: 117px !important;
-  height: 117px !important;
-}
-
-.el-upload-dragger .el-icon-upload {
-  margin: 0 !important;
-}
-
-.el-upload__text {
-  font-size: 12px !important;
-  color: #3699ff !important;
-  text-align: center !important;
-  margin-top: 10px !important;
-}
-
-.el-upload--picture-card {
-  line-height: 0px !important;
-}
-
-.el-dialog {
-  background: #323d4e !important;
-  border-radius: 10px !important;
-}
-
-.el-form-item__label {
-  color: #979797 !important;
-}
-
-.el-dialog__header {
-  border-bottom: 1px solid #e8e8e8 !important;
-  padding-bottom: 20px !important;
-}
-
-.el-dialog__title {
-  color: white !important;
-}
-</style>
